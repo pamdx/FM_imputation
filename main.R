@@ -13,19 +13,34 @@ library(tidyr)
 library(tibble)
 library(compareDF)
 library(Rilostat)
+library(OECD)
 library(stargazer)
 library(gridExtra)
 
 theme_set(theme_bw())
 
+# Run functions
+
+source("./modules/functions_shiny.R")
+
 # App parameters
 
   # Data import
 
-country_input <- "Afghanistan"
-OC1_input <- "Aquaculture"
+country_input <- "France"
+OC1_input <- "Marine fishing"
 start_year <- 1995
 end_year <- 2018
+
+# Data import
+
+source("./modules/data_import_shiny.R")
+
+# Subseries-related analyses
+
+source("./modules/subseries_analysis.R")
+
+# App parameters
 
   # Reg
 
@@ -45,19 +60,7 @@ obs_threshold_trend <- round(length(years_all)*share_valid_trend)
 histavg_threshold <- 5 # Number of previous years on which to base estimates, make as interactive input in Shiny App
 histgrowth_threshold <- 5
 
-# Run functions
-
-source("./modules/functions_shiny.R")
-
-# Data import
-
-source("./modules/data_import_shiny.R")
-
-# Subseries-related analyses
-
-source("./modules/subseries_analysis.R")
-
-# Aggregated imputation
+  # Aggregated imputation
 
 source("./modules/imputation_aggregated.R")
 

@@ -12,6 +12,16 @@ if(length(years_data_excl_mixed) >= obs_threshold_linreg) {
   
   ILO_labor_agg <- ILOlabor_agg(ILOlaborraw = ILO_labor_raw, countrynames = country_names, countryinput = country_input, targetlaborclassif1 = target_labor_classif1, startyear = start_year, endyear = end_year)
   
+  if (country_input %in% OECD_countries & OC1_input == "Marine fishing") {
+   
+    OECD_fleet_agg <- OECD_fleet_raw %>%
+      select(Country_en, year, value) %>%
+      filter(Country_en == country_input, between(year, start_year, end_year))
+    
+    OECD_fleet_agg$year <- as.integer(OECD_fleet_agg$year)
+     
+  }
+  
   # Generate dataset for regression
   
   reg_data <- regression_data(yearsall = years_all, FMagg = FM_agg, ILOlaboragg = ILO_labor_agg, prodagg = prod_agg)
