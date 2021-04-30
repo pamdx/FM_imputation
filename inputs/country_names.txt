@@ -1,0 +1,263 @@
+Country_en	iso3	development
+Afghanistan	AFG	Developing
+Albania	ALB	Developed
+Algeria	DZA	Developing
+American Samoa	ASM	Developing
+Andorra	AND	Developed
+Angola	AGO	Developing
+Antigua and Barbuda	ATG	Developing
+Azerbaijan	AZE	Developing
+Argentina	ARG	Developing
+Australia	AUS	Developed
+Austria	AUT	Developed
+Bahamas	BHS	Developing
+Bahrain	BHR	Developing
+Bangladesh	BGD	Developing
+Armenia	ARM	Developing
+Barbados	BRB	Developing
+Belgium	BEL	Developed
+Bermuda	BMU	Developed
+Bhutan	BTN	Developing
+Bolivia (Plurinat.State)	BOL	Developing
+Bosnia and Herzegovina	BIH	Developed
+Botswana	BWA	Developing
+Bouvet Island	BVT	Developing
+Brazil	BRA	Developing
+Belize	BLZ	Developing
+British Indian Ocean Ter	IOT	Developing
+Christmas Island	CXR	Developed
+British Virgin Islands	VGB	Developing
+Brunei Darussalam	BRN	Developing
+Bulgaria	BGR	Developed
+Myanmar	MMR	Developing
+Burundi	BDI	Developing
+Belarus	BLR	Developed
+Cambodia	KHM	Developing
+Cameroon	CMR	Developing
+Canada	CAN	Developed
+Cabo Verde	CPV	Developing
+Cayman Islands	CYM	Developing
+Central African Republic	CAF	Developing
+Sri Lanka	LKA	Developing
+Chad	TCD	Developing
+Chile	CHL	Developing
+China	CHN	Developing
+Taiwan Province of China	TWN	Developing
+Cocos (Keeling) Islands	CCK	Developed
+Cook Islands	COK	Developing
+Colombia	COL	Developing
+Comoros	COM	Developing
+Mayotte	MYT	Developing
+Congo	COG	Developing
+"Congo, Dem. Rep. of the"	COD	Developing
+Fiji	FJI	Developing
+Costa Rica	CRI	Developing
+Croatia	HRV	Developed
+Cuba	CUB	Developing
+Cyprus	CYP	Developed
+Czechoslovakia	CSK	Developed
+Czechia	CZE	Developed
+Benin	BEN	Developing
+Denmark	DNK	Developed
+Dominica	DMA	Developing
+Dominican Republic	DOM	Developing
+Ecuador	ECU	Developing
+El Salvador	SLV	Developing
+Equatorial Guinea	GNQ	Developing
+Ethiopia PDR		Developing
+Ethiopia	ETH	Developing
+Eritrea	ERI	Developing
+Estonia	EST	Developed
+Faroe Islands	FRO	Developed
+Falkland Is.(Malvinas)	FLK	Developing
+SouthGeorgia-Sandwich Is	SGS	Developing
+French Polynesia	PYF	Developing
+Finland	FIN	Developed
+Åland Islands	ALA	Developed
+France	FRA	Developed
+French Guiana	GUF	Developing
+Guam	GUM	Developing
+French Southern Terr	ATF	Developing
+Djibouti	DJI	Developing
+Gabon	GAB	Developing
+Georgia	GEO	Developing
+Gambia	GMB	Developing
+Gaza Strip(Palestine)		Developing
+Palestine	PSE	Developing
+Germany	DEU	Developed
+"Germany,New Länder"	DDR	Developed
+"Germany, Fed. Rep. of"	GFR	Developed
+Ghana	GHA	Developing
+Gibraltar	GIB	Developed
+Heard and McDonald Is.	HMD	Developed
+Greece	GRC	Developed
+Greenland	GRL	Developed
+Grenada	GRD	Developing
+Guadeloupe	GLP	Developing
+Kiribati	KIR	Developing
+Guatemala	GTM	Developing
+Guinea	GIN	Developing
+Guyana	GUY	Developing
+Haiti	HTI	Developing
+Marshall Islands	MHL	Developing
+Holy See	VAT	Developed
+Honduras	HND	Developing
+"China, Hong Kong SAR"	HKG	Developing
+Hungary	HUN	Developed
+Iceland	ISL	Developed
+India	IND	Developing
+Indonesia	IDN	Developing
+Iran (Islamic Rep. of)	IRN	Developing
+Iraq	IRQ	Developing
+Ireland	IRL	Developed
+Israel	ISR	Developed
+Italy	ITA	Developed
+Cote d'Ivoire	CIV	Developing
+Jamaica	JAM	Developing
+Japan	JPN	Developed
+Kazakhstan	KAZ	Developing
+Jordan	JOR	Developing
+Kenya	KEN	Developing
+"Korea, Dem. People's Rep"	PRK	Developing
+"Korea, Republic of"	KOR	Developing
+Kuwait	KWT	Developing
+Kyrgyzstan	KGZ	Developing
+Lao People's Dem. Rep.	LAO	Developing
+Lebanon	LBN	Developing
+Lesotho	LSO	Developing
+Latvia	LVA	Developed
+Liberia	LBR	Developing
+Libya	LBY	Developing
+Liechtenstein	LIE	Developed
+Lithuania	LTU	Developed
+Luxembourg	LUX	Developed
+"China, Macao SAR"	MAC	Developing
+Madagascar	MDG	Developing
+Malawi	MWI	Developing
+Malaysia	MYS	Developing
+Maldives	MDV	Developing
+Mali	MLI	Developing
+Malta	MLT	Developed
+Martinique	MTQ	Developing
+Mauritania	MRT	Developing
+Mauritius	MUS	Developing
+Mexico	MEX	Developing
+Monaco	MCO	Developed
+Mongolia	MNG	Developing
+"Moldova, Republic of"	MDA	Developed
+Montenegro	MNE	Developed
+Montserrat	MSR	Developing
+Morocco	MAR	Developing
+Mozambique	MOZ	Developing
+Oman	OMN	Developing
+Namibia	NAM	Developing
+"Micronesia,Fed.States of"	FSM	Developing
+Nepal	NPL	Developing
+Netherlands	NLD	Developed
+Netherlands Antilles	ANT	Developing
+Curaçao	CUW	Developing
+Aruba	ABW	Developing
+Sint Maarten	SXM	Developing
+Bonaire-S.Eustatius-Saba	BES	Developing
+Nauru	NRU	Developing
+New Caledonia	NCL	Developing
+New Zealand	NZL	Developed
+Nicaragua	NIC	Developing
+Niger	NER	Developing
+Nigeria	NGA	Developing
+Niue	NIU	Developing
+Norfolk Island	NFK	Developed
+Norway	NOR	Developed
+Northern Mariana Is.	MNP	Developing
+Palau	PLW	Developing
+Papua New Guinea	PNG	Developing
+Pitcairn Islands	PCN	Developing
+Samoa	WSM	Developing
+Pakistan	PAK	Developing
+Panama	PAN	Developing
+Solomon Islands	SLB	Developing
+Paraguay	PRY	Developing
+Peru	PER	Developing
+Philippines	PHL	Developing
+Tokelau	TKL	Developing
+Poland	POL	Developed
+Portugal	PRT	Developed
+Guinea-Bissau	GNB	Developing
+Timor-Leste	TLS	Developing
+Puerto Rico	PRI	Developing
+Qatar	QAT	Developing
+Reunion	REU	Developing
+Romania	ROU	Developed
+Russian Federation	RUS	Developed
+Rwanda	RWA	Developing
+Saint Barthélemy	BLM	Developing
+Saint Helena	SHN	Developing
+Saint Kitts and Nevis	KNA	Developing
+Anguilla	AIA	Developing
+Saint Lucia	LCA	Developing
+Saint-Martin	MAF	Developing
+St. Pierre and Miquelon	SPM	Developed
+Saint Vincent-Grenadines	VCT	Developing
+San Marino	SMR	Developed
+Sao Tome and Principe	STP	Developing
+Sark		Developed
+Saudi Arabia	SAU	Developing
+Senegal	SEN	Developing
+Serbia	SRB	Developed
+Seychelles	SYC	Developing
+Sierra Leone	SLE	Developing
+Singapore	SGP	Developing
+Slovakia	SVK	Developed
+Viet Nam	VNM	Developing
+Slovenia	SVN	Developed
+Somalia	SOM	Developing
+South Africa	ZAF	Developing
+Zimbabwe	ZWE	Developing
+Spain	ESP	Developed
+South Sudan	SSD	Developing
+Sudan	SDN	Developing
+Western Sahara	ESH	Developing
+Sudan (former)		Developing
+Suriname	SUR	Developing
+Svalbard and Jan Mayen	SJM	Developed
+Eswatini	SWZ	Developing
+Sweden	SWE	Developed
+Switzerland	CHE	Developed
+Syrian Arab Republic	SYR	Developing
+Tajikistan	TJK	Developing
+Thailand	THA	Developing
+Togo	TGO	Developing
+Tonga	TON	Developing
+Tuvalu	TUV	Developing
+Trinidad and Tobago	TTO	Developing
+United Arab Emirates	ARE	Developing
+Tunisia	TUN	Developing
+Turkey	TUR	Developing
+Turkmenistan	TKM	Developing
+Turks and Caicos Is.	TCA	Developing
+US Minor Outlying Is.	UMI	Developing
+Uganda	UGA	Developing
+Ukraine	UKR	Developed
+North Macedonia	MKD	Developed
+Un. Sov. Soc. Rep.	SUN	Developed
+Egypt	EGY	Developing
+United Kingdom	GBR	Developed
+Channel Islands		Developed
+Guernsey	GGY	Developed
+Jersey	JEY	Developed
+Isle of Man	IMN	Developed
+"Tanzania, United Rep. of"	TZA	Developing
+Zanzibar		Developing
+United States of America	USA	Developed
+US Virgin Islands	VIR	Developing
+Burkina Faso	BFA	Developing
+Uruguay	URY	Developing
+Uzbekistan	UZB	Developing
+"Venezuela, Boliv Rep of"	VEN	Developing
+Vanuatu	VUT	Developing
+Wallis and Futuna Is.	WLF	Developing
+Yemen	YEM	Developing
+Yugoslavia SFR	YUG	Developed
+Serbia and Montenegro	SCG	Developed
+Zambia	ZMB	Developing
+Other nei		FALSE
