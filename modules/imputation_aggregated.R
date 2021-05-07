@@ -10,31 +10,39 @@ if(length(years_data_excl_mixed) >= obs_threshold_linreg) {
   
   prod_agg <- prodagg(prodraw = prod_raw, countryinput = country_input, OC1input = OC1_input, startyear = start_year, endyear = end_year)
   
-  ILO_labor_agg <- ILOlabor_agg(ILOlaborraw = ILO_labor_raw, countrynames = country_names, countryinput = country_input, targetlaborclassif1 = target_labor_classif1, startyear = start_year, endyear = end_year)
+  ILO_labor_agg <- ILOlabor_agg(ILOlaborraw = ILO_labor_raw, countryinput = country_input, startyear = start_year, endyear = end_year)
   
   if (country_input %in% OECD_countries & OC1_input == "Marine fishing") {
    
-    OECD_fleet_agg <- OECD_fleet_raw %>%
-      select(Country_en, year, value) %>%
-      filter(Country_en == country_input, between(year, start_year, end_year))
-    
-    OECD_fleet_agg$year <- as.integer(OECD_fleet_agg$year)
+    OECD_fleet_agg <- OECDfleet_agg(OECDfleetraw = OECD_fleet_raw, countryinput = country_input, startyear = start_year, endyear = end_year)
      
   }
   
   # Generate dataset for regression
   
-  reg_data <- regression_data(yearsall = years_all, FMagg = FM_agg, ILOlaboragg = ILO_labor_agg, prodagg = prod_agg)
+  if (country_input %in% OECD_countries & OC1_input == "Marine fishing") {
+    
+    reg_data <- regression_data_fleet(yearsall = years_all, FMagg = FM_agg, ILOlaboragg = ILO_labor_agg, prodagg = prod_agg, OECDfleetagg = OECD_fleet_agg)
+    
+  } else reg_data <- regression_data(yearsall = years_all, FMagg = FM_agg, ILOlaboragg = ILO_labor_agg, prodagg = prod_agg)
   
   # Linear regression summary plots
   
-  reg_variables_viz(regdata = reg_data, startyear = start_year, endyear = end_year, OC1input = OC1_input, countryinput = country_input)
+  if (country_input %in% OECD_countries & OC1_input == "Marine fishing") {
+    
+    reg_variables_viz_fleet(regdata = reg_data, startyear = start_year, endyear = end_year, OC1input = OC1_input, countryinput = country_input)
+    
+  } else reg_variables_viz(regdata = reg_data, startyear = start_year, endyear = end_year, OC1input = OC1_input, countryinput = country_input)
   
   # Regression
   
   reg_result <- if (reg_type == 1) {
     
-    reg_automatic(regdata = reg_data, startyear = start_year, endyear = end_year)
+    if (country_input %in% OECD_countries & OC1_input == "Marine fishing") {
+      
+      reg_automatic_fleet(regdata = reg_data, startyear = start_year, endyear = end_year)
+      
+    } else reg_automatic(regdata = reg_data, startyear = start_year, endyear = end_year)
     
   } else if (reg_type == 2) {
     

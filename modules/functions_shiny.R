@@ -336,7 +336,7 @@ FMagg <- function(FMfiltered, yearsdataexclmixed){
 prodagg <- function(prodraw, countryinput, OC1input, startyear, endyear){
   
   prodraw %>%
-    filter(country == countryinput) %>% # In Shiny, replace by input from dropdown menu
+    filter(country == countryinput) %>%
     filter(OC2 == OC1input) %>%
     filter(between(year, startyear, endyear)) %>%
     group_by(year) %>%
@@ -345,24 +345,31 @@ prodagg <- function(prodraw, countryinput, OC1input, startyear, endyear){
 
 # Function to aggregate ILO labor data
 
-ILOlabor_agg <- function(ILOlaborraw, countrynames, countryinput, targetlaborclassif1, startyear, endyear){
+ILOlabor_agg <- function(ILOlaborraw, countryinput, startyear, endyear){
   
   ILO_labor_agg <- ILOlaborraw %>%
-    rename(iso3 = ref_area) %>%
-    merge(countrynames) %>%
     filter(Country_en == countryinput) %>%
-    filter(classif1 %in% targetlaborclassif1) %>% 
-    filter(sex != "SEX_T") %>% 
-    filter(between(time, startyear, endyear)) %>% 
-    mutate(labor_value = obs_value*1000) %>%
-    group_by(time) %>%
-    summarise(labor_value = sum(labor_value)) %>%
-    rename(year = time)
+    filter(between(year, startyear, endyear)) %>% 
+    group_by(year) %>%
+    summarise(labor_value = sum(labor_value))
   
   ILO_labor_agg$year <- as.integer(ILO_labor_agg$year) 
   
   return(ILO_labor_agg)
   
+}
+
+# Function to aggregate OECD fleet data
+
+OECDfleet_agg <- function(OECDfleetraw, countryinput, startyear, endyear){
+  
+  OECD_fleet_agg <- OECDfleetraw %>%
+    filter(Country_en == countryinput, between(year, startyear, endyear))
+
+  OECD_fleet_agg$year <- as.integer(OECD_fleet_agg$year)
+  
+  return(OECD_fleet_agg)
+
 }
 
 # Generate dataset for regression
@@ -374,6 +381,17 @@ regression_data <- function(yearsall, FMagg, ILOlaboragg, prodagg){
            left_join(FMagg %>% rename(emp_value = value), by = "year") %>%
            left_join(ILOlaboragg, by = "year") %>%
            left_join(prodagg, by = "year"))
+  
+}
+
+regression_data_fleet <- function(yearsall, FMagg, ILOlaboragg, prodagg, OECDfleetagg){
+  
+  return(data.frame(yearsall) %>%
+           rename(year = yearsall) %>%
+           left_join(FMagg %>% rename(emp_value = value), by = "year") %>%
+           left_join(ILOlaboragg, by = "year") %>%
+           left_join(prodagg, by = "year") %>%
+           left_join(OECDfleetagg, by = "year"))
   
 }
 
@@ -412,6 +430,48 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC1input, countryinpu
   
 }
 
+reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC1input, countryinput){
+  
+  plot_emp <- ggplot(regdata, aes(x=year,y=emp_value, group = 1)) + 
+    geom_line() + 
+    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    labs(title = paste(OC1input, " employment (FAO data)"), 
+         subtitle = countryinput, 
+         y="Number of people") +
+    scale_y_continuous(labels = addUnits) + 
+    theme(aspect.ratio = 3/4)
+  
+  plot_prod <- ggplot(regdata, aes(x=year,y=prod_value, group = 1)) + 
+    geom_line() + 
+    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    labs(title = paste(OC1input, " production (FAO data)"), 
+         subtitle = countryinput, 
+         y="Tonnes") +
+    scale_y_continuous(labels = addUnits) + 
+    theme(aspect.ratio = 3/4)
+  
+  plot_labor <- ggplot(regdata, aes(x=year, y=labor_value, group = 1)) + 
+    geom_line() + 
+    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    labs(title ="Labor force (ILO data)", 
+         subtitle = countryinput, 
+         y="Number of people") +
+    scale_y_continuous(labels = addUnits) + 
+    theme(aspect.ratio = 3/4)
+  
+  plot_fleet <- ggplot(regdata, aes(x=year, y=fleet_value, group = 1)) + 
+    geom_line() + 
+    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    labs(title ="Fleet (OECD data)", 
+         subtitle = countryinput, 
+         y="Number of vessels") +
+    scale_y_continuous(labels = addUnits) + 
+    theme(aspect.ratio = 3/4)
+  
+  return(grid.arrange(plot_emp, plot_prod, plot_labor, plot_fleet, ncol=2))
+  
+}
+
 # Regression with automatic model choice
 
 reg_automatic <- function(regdata, startyear, endyear){
@@ -426,6 +486,32 @@ reg_automatic <- function(regdata, startyear, endyear){
   
   try(fit_emp_2 <- lm(
     emp_value ~ prod_value + labor_value,
+    data = reg_data_ts), silent = TRUE)
+  
+  try(fit_emp_3 <- lm(
+    emp_value ~ trend + prod_value,
+    data = reg_data_ts), silent = TRUE)
+  
+  try(fit_emp_4 <- lm(
+    emp_value ~ prod_value,
+    data = reg_data_ts), silent = TRUE) 
+  
+  return(list(fit_emp_1, fit_emp_2, fit_emp_3, fit_emp_4))
+  
+}
+
+reg_automatic_fleet <- function(regdata, startyear, endyear){
+  
+  reg_data_ts <- ts(regdata, start = startyear)
+  
+  trend <- seq(startyear:endyear)
+  
+  try(fit_emp_1 <- lm(
+    emp_value ~ trend + prod_value + labor_value + fleet_value,
+    data = reg_data_ts), silent = TRUE)
+  
+  try(fit_emp_2 <- lm(
+    emp_value ~ prod_value + labor_value + fleet_value,
     data = reg_data_ts), silent = TRUE)
   
   try(fit_emp_3 <- lm(
@@ -458,7 +544,7 @@ reg_manual <- function(regdata, startyear, manual_model){
 
 reg_result_summary <- function(regresult){
   
-  stargazer(regresult, title = "Results of linear models", align = TRUE, type = "html") 
+  stargazer(regresult, title = "Results of linear models", align = TRUE, type = "text") 
   
 }
 

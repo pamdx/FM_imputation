@@ -46,7 +46,7 @@ share_valid_reg <- 0.3
 obs_threshold_linreg <- round(length(years_all)*share_valid_reg)
 reg_type <- 1
 trend <- seq(start_year:end_year)
-reg_dynamic <- emp_value ~ trend # Choose independent variables from: trend, prod_value, labor_value
+reg_dynamic <- emp_value ~ trend + prod_value + labor_value + fleet_value # Choose independent variables from: trend, prod_value, labor_value, fleet_value (separated by "+")
 
   # Trend
 
