@@ -12,8 +12,6 @@ library(readr)
 library(tidyr)
 library(tibble)
 library(compareDF)
-library(Rilostat)
-library(OECD)
 library(stargazer)
 library(gridExtra)
 
