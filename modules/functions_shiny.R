@@ -967,8 +967,8 @@ estimates_table <- function(FMfiltered, reg_estimates, trend_estimates, linearin
     arrange(year, subseries) %>%
     separate(subseries, c("geographic_area", "oc1", "oc2", "working_time", "sex"), "_") %>%
     unite(subseries, oc2, working_time, sex, sep = " | ", remove = TRUE) %>%
-    select(-c(1:2)) %>%
-    select(subseries, year, data, reg, trend, linearint, histavg, histgrowth, bdragged, fdragged)
+    select(-c(1:2)) # %>%
+    # select(subseries, year, data, reg, trend, linearint, histavg, histgrowth, bdragged, fdragged)
   
 }
 
@@ -1006,45 +1006,95 @@ imputed_data_init <- function(FMfiltered){
 
 # Impute data by groups of consecutive missing years
 
+# agg_imputation_consecutive <- function(missingyearsseriesinclmixed, imputeddata, regestimatesdisag, trendestimatesdisag, linearintestimatesdisag, histavgestimatesdisag, histgrowthestimatesdisag, bdraggedestimatesdisag, fdraggedestimatesdisag){
+#   
+#   for (i in missingyearsseriesinclmixed) {
+#     
+#     selected_estimator <- menu(c("Linear regression", "Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged"), title=paste0("Which estimator would you like to select for the following year(s): ", toString(i), "?"))
+#     
+#     switch(selected_estimator,
+#            
+#            '1' = imputeddata <- imputeddata %>% 
+#              bind_rows(regestimatesdisag %>%
+#                          filter(year %in% i) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '2' = imputeddata <- imputeddata %>% 
+#              bind_rows(trendestimatesdisag %>%
+#                          filter(year %in% i) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '3' = imputeddata <- imputeddata %>% 
+#              bind_rows(linearintestimatesdisag %>%
+#                          filter(year %in% i) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '4' = imputeddata <- imputeddata %>% 
+#              bind_rows(histavgestimatesdisag %>%
+#                          filter(year %in% i) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '5' = imputeddata <- imputeddata %>% 
+#              bind_rows(histgrowthestimatesdisag %>%
+#                          filter(year %in% i) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '6' = imputeddata <- imputeddata %>% 
+#              bind_rows(bdraggedestimatesdisag %>%
+#                          filter(year %in% i) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '7' = imputeddata <- imputeddata %>% 
+#              bind_rows(fdraggedestimatesdisag %>%
+#                          filter(year %in% i) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#     )
+#   }
+#   
+#   return(imputeddata)
+#   
+# }
+
 agg_imputation_consecutive <- function(missingyearsseriesinclmixed, imputeddata, regestimatesdisag, trendestimatesdisag, linearintestimatesdisag, histavgestimatesdisag, histgrowthestimatesdisag, bdraggedestimatesdisag, fdraggedestimatesdisag){
   
   for (i in missingyearsseriesinclmixed) {
     
-    selected_estimator <- menu(c("Linear regression", "Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged"), title=paste0("Which estimator would you like to select for the following year(s): ", toString(i), "?"))
+    selected_estimator <- select.list(c("Linear regression", "Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged"), preselect = NULL, multiple = FALSE, graphics = TRUE, title=paste0("Estimator for ", toString(i), "?"))
     
     switch(selected_estimator,
            
-           '1' = imputeddata <- imputeddata %>% 
+           "Linear regression" = imputeddata <- imputeddata %>% 
              bind_rows(regestimatesdisag %>%
                          filter(year %in% i) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '2' = imputeddata <- imputeddata %>% 
+           "Polynomial trend" = imputeddata <- imputeddata %>% 
              bind_rows(trendestimatesdisag %>%
                          filter(year %in% i) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '3' = imputeddata <- imputeddata %>% 
+           "Linear interpolation" = imputeddata <- imputeddata %>% 
              bind_rows(linearintestimatesdisag %>%
                          filter(year %in% i) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '4' = imputeddata <- imputeddata %>% 
+           "Historical average" = imputeddata <- imputeddata %>% 
              bind_rows(histavgestimatesdisag %>%
                          filter(year %in% i) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '5' = imputeddata <- imputeddata %>% 
+           "Historical growth" = imputeddata <- imputeddata %>% 
              bind_rows(histgrowthestimatesdisag %>%
                          filter(year %in% i) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '6' = imputeddata <- imputeddata %>% 
+           "Backward dragged" = imputeddata <- imputeddata %>% 
              bind_rows(bdraggedestimatesdisag %>%
                          filter(year %in% i) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '7' = imputeddata <- imputeddata %>% 
+           "Forward dragged" = imputeddata <- imputeddata %>% 
              bind_rows(fdraggedestimatesdisag %>%
                          filter(year %in% i) %>%
                          mutate(timestamp = paste(Sys.time()))),
@@ -1110,51 +1160,115 @@ agg_imputation_yby <- function(missingyearsseriesinclmixed, imputeddata, regesti
 
 # Subseries-level imputation
 
+# subseries_imputation <- function(ss, imputeddata, FMfiltered){
+#   
+#   imputation_on <- TRUE
+#   
+#   while (imputation_on) {
+#     
+#     selected_subseries <- ss[menu(c(ss), title=paste0("Which subseries would you like estimate?"))]
+#     
+#     # Estimator selection
+#     
+#     selected_estimator <- menu(c("Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged", "Stop imputation"), title = "Which estimator would you like to apply?")
+#     
+#     switch(selected_estimator,
+#            
+#            '1' = imputeddata <- imputeddata %>% 
+#              bind_rows(trend_estimator(trenddata = trend_fit(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall = years_all, startyear = start_year)) %>%
+#                          mutate(subseries = selected_subseries) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '2' = imputeddata <- imputeddata %>% 
+#              bind_rows(filter(linearint_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all), !is.na(value)) %>%
+#                          mutate(subseries = selected_subseries) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '3' = imputeddata <- imputeddata %>% 
+#              bind_rows(filter(histavg_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all, threshold = histavg_threshold), !is.na(value)) %>%
+#                          mutate(subseries = selected_subseries) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '4' = imputeddata <- imputeddata %>% 
+#              bind_rows(filter(histgrowth_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all, threshold = histgrowth_threshold), !is.na(value)) %>%
+#                          mutate(subseries = selected_subseries) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '5' = imputeddata <- imputeddata %>% 
+#              bind_rows(filter(bdragged_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all), !is.na(value)) %>%
+#                          mutate(subseries = selected_subseries) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '6' = imputeddata <- imputeddata %>% 
+#              bind_rows(filter(fdragged_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all), !is.na(value)) %>%
+#                          mutate(subseries = selected_subseries) %>%
+#                          mutate(timestamp = paste(Sys.time()))),
+#            
+#            '7' = imputation_on <- FALSE
+#     )
+#     
+#   }
+#   
+#   return(imputeddata)
+#   
+# }
+
 subseries_imputation <- function(ss, imputeddata, FMfiltered){
   
   imputation_on <- TRUE
   
   while (imputation_on) {
     
-    selected_subseries <- ss[menu(c(ss), title=paste0("Which subseries would you like estimate?"))]
+    selected_subseries <- select.list(c(ss, "Stop imputation"), preselect = NULL, multiple = FALSE, graphics = TRUE, title=paste0("Which subseries would you like estimate?"))
     
-    # Estimator selection
+    if (selected_subseries == "Stop imputation") {
+     
+      imputation_on <- FALSE
+      next
+       
+    }
     
-    selected_estimator <- menu(c("Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged", "Stop imputation"), title = "Which estimator would you like to apply?")
+    selected_estimator <- select.list(c("Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged"), preselect = NULL, multiple = FALSE, graphics = TRUE, title = "Which estimator would you like to apply?")
+    
+    selected_year <- select.list(as.character(setdiff(years_all, FM_filtered$year[FM_filtered$subseries == selected_subseries])), preselect = NULL, multiple = TRUE, graphics = TRUE, title = "On which missing years should the estimation be performed?")
     
     switch(selected_estimator,
            
-           '1' = imputeddata <- imputeddata %>% 
+           "Polynomial trend" = imputeddata <- imputeddata %>% 
              bind_rows(trend_estimator(trenddata = trend_fit(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall = years_all, startyear = start_year)) %>%
+                         filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '2' = imputeddata <- imputeddata %>% 
+           "Linear interpolation" = imputeddata <- imputeddata %>% 
              bind_rows(filter(linearint_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all), !is.na(value)) %>%
+                         filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '3' = imputeddata <- imputeddata %>% 
+           "Historical average" = imputeddata <- imputeddata %>% 
              bind_rows(filter(histavg_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all, threshold = histavg_threshold), !is.na(value)) %>%
+                         filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '4' = imputeddata <- imputeddata %>% 
+           "Historical growth" = imputeddata <- imputeddata %>% 
              bind_rows(filter(histgrowth_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all, threshold = histgrowth_threshold), !is.na(value)) %>%
+                         filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '5' = imputeddata <- imputeddata %>% 
+           "Backward dragged" = imputeddata <- imputeddata %>% 
              bind_rows(filter(bdragged_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all), !is.na(value)) %>%
+                         filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           '6' = imputeddata <- imputeddata %>% 
+           "Forward dragged" = imputeddata <- imputeddata %>% 
              bind_rows(filter(fdragged_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_data_excl_mixed, yearsall= years_all), !is.na(value)) %>%
+                         filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
-                         mutate(timestamp = paste(Sys.time()))),
-           
-           '7' = imputation_on <- FALSE
+                         mutate(timestamp = paste(Sys.time())))
     )
     
   }
