@@ -24,4 +24,8 @@ ctable = compare_df(imputed_data %>%
 
 # Output HTML table
 
-create_output_table(ctable,output_type = "html",file_name = paste0("./outputs/", country_input, "_", OC1_input, "_comparison.html"))
+create_output_table(
+  ctable,
+  output_type = "html",
+  file_name = paste0("./outputs/", country_input, "_", OC1_input, "_comparison.html"),
+  limit = 1000)
