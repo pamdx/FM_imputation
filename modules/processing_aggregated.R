@@ -95,7 +95,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_linreg) {
   
   reg_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = reg_estimates_agg, countryinput = country_input, OC1input = OC1_input, FMfiltered = FM_filtered, missingyears = missing_years, comment = "Linear regression estimate")
   
-}
+} else reg_estimates_disag <- tibble(subseries = character(), year = integer(), value = integer(), flag = character(), comment = character())
 
 ##### POLYNOMIAL TREND ESTIMATION #####
 
@@ -117,7 +117,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_trend) {
   
   trend_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = trends_estimates_agg, countryinput = country_input, OC1input = OC1_input, FMfiltered = FM_filtered, missingyears = missing_years, comment = paste0("Polynomial trend estimate (", trend_predictions_agg$trend_type[1], ")"))
   
-}
+} else trend_estimates_disag <- tibble(subseries = character(), year = integer(), value = integer(), flag = character(), comment = character())
 
 ##### LBFH ESTIMATIONS #####
 
