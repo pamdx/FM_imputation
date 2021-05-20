@@ -49,6 +49,7 @@ data <- data  %>%
       geom_bar(aes(y = estimate, fill = subseries), stat="identity", colour="white") + 
       labs(title = title, subtitle = paste(countryinput, "|", OC1_input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
       scale_y_continuous(labels = addUnits) + 
+      scale_x_continuous(breaks = integer_breaks()) +
       theme(aspect.ratio = 3/4)
   )
   
@@ -814,8 +815,15 @@ linearint_estimator <- function(FMagg, yearsdataexclmixed, yearsall){
     }
   }
   
-  linearint_estimates$flag <- "E"
-  linearint_estimates$comment <- "Linear interpolation estimate"
+  linearint_estimates <- linearint_estimates %>%
+    filter(!is.na(value))
+  
+  if (nrow(linearint_estimates) > 0) {
+  
+    linearint_estimates$flag <- "E"
+    linearint_estimates$comment <- "Linear interpolation estimate"
+  
+  }
   
   return(linearint_estimates)
   
@@ -868,8 +876,12 @@ histavg_estimator <- function(FMagg, yearsdataexclmixed, yearsall, threshold){
     select(year, histavg) %>%
     rename(value = histavg)
   
-  histavg_estimates$flag <- "E"
-  histavg_estimates$comment <- "Historical average estimate"
+  if (nrow(histavg_estimates) > 0) {
+   
+    histavg_estimates$flag <- "E"
+    histavg_estimates$comment <- "Historical average estimate"
+     
+  }
   
   return(histavg_estimates)
   
@@ -923,9 +935,13 @@ histgrowth_estimator <- function(FMagg, yearsdataexclmixed, yearsall, threshold)
     select(year, histgrowth) %>%
     rename(value = histgrowth)
   
-  histgrowth_estimates$flag <- "E"
-  histgrowth_estimates$comment <- "Historical growth estimate"
+  if (nrow(histgrowth_estimates) > 0) {
   
+    histgrowth_estimates$flag <- "E"
+    histgrowth_estimates$comment <- "Historical growth estimate"
+
+  }
+      
   return(histgrowth_estimates)
   
 }
@@ -988,6 +1004,7 @@ estimator_viz <- function(estimator, dataset, countryinput, OC1input){
         geom_bar(aes(y = get(estimator), fill = subseries), stat="identity", colour="white") + 
         labs(title = paste("Visualization of official data and", estimator, "estimator"), subtitle = paste(countryinput, "|", OC1input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
         scale_y_continuous(labels = addUnits) + 
+        scale_x_continuous(breaks = integer_breaks()) +
         theme(aspect.ratio = 3/4)
     )
   }
@@ -1298,4 +1315,15 @@ addUnits <- function(n) {
                                                'too big!'
                                         )))))
   return(labels)
+}
+
+# A function factory for getting integer axis values on plots.
+
+integer_breaks <- function(n = 5, ...) {
+  fxn <- function(x) {
+    breaks <- floor(pretty(x, n, ...))
+    names(breaks) <- attr(breaks, "labels")
+    breaks
+  }
+  return(fxn)
 }
