@@ -4,7 +4,7 @@
 
 ##### LM ESTIMATION #####
 
-if(length(years_data_excl_mixed) >= obs_threshold_linreg) {
+if(length(years_data_excl_mixed) >= obs_threshold_linreg & OC1_input %in% c("Aquaculture", "Marine fishing", "Inland fishing")) {
   
   # Aggregate datasets
   
