@@ -4,10 +4,18 @@
 
 imputed_data <- imputed_data_init(FMfiltered = FM_filtered)
 
-# Impute data by groups of consecutive missing years
+# Impute data (consecutive or year-by-year)
 
-imputed_data <- agg_imputation_consecutive(missingyearsseriesinclmixed = missing_years_series_incl_mixed, imputeddata = imputed_data, regestimatesdisag = reg_estimates_disag, trendestimatesdisag = trend_estimates_disag, linearintestimatesdisag = linearint_estimates_disag, histavgestimatesdisag = histavg_estimates_disag, histgrowthestimatesdisag = histgrowth_estimates_disag, bdraggedestimatesdisag = bdragged_estimates_disag, fdraggedestimatesdisag = fdragged_estimates_disag)
+imputed_data <- if (agg_imputation_type == 1) {
+  
+  aggregated_imputation(finalestimates = final_estimates, missingyears = missing_years_series_incl_mixed, imputeddata = imputed_data, regestimatesdisag = reg_estimates_disag, trendestimatesdisag = trend_estimates_disag, linearintestimatesdisag = linearint_estimates_disag, histavgestimatesdisag = histavg_estimates_disag, histgrowthestimatesdisag = histgrowth_estimates_disag, bdraggedestimatesdisag = bdragged_estimates_disag, fdraggedestimatesdisag = fdragged_estimates_disag, FMexisitingestimates = FM_exisiting_estimates)
+  
+} else if (agg_imputation_type == 2) {
+  
+  aggregated_imputation(finalestimates = final_estimates, missingyears = missing_years_incl_mixed, imputeddata = imputed_data, regestimatesdisag = reg_estimates_disag, trendestimatesdisag = trend_estimates_disag, linearintestimatesdisag = linearint_estimates_disag, histavgestimatesdisag = histavg_estimates_disag, histgrowthestimatesdisag = histgrowth_estimates_disag, bdraggedestimatesdisag = bdragged_estimates_disag, fdraggedestimatesdisag = fdragged_estimates_disag, FMexisitingestimates = FM_exisiting_estimates)
+  
+}
 
-# Impute data by individual missing years
-# 
-# imputed_data <- agg_imputation_yby(missingyearsseriesinclmixed = missing_years_series_incl_mixed, imputeddata = imputed_data, regestimatesdisag = reg_estimates_disag, trendestimatesdisag = trend_estimates_disag, linearintestimatesdisag = linearint_estimates_disag, histavgestimatesdisag = histavg_estimates_disag, histgrowthestimatesdisag = histgrowth_estimates_disag, bdraggedestimatesdisag = bdragged_estimates_disag, fdraggedestimatesdisag = fdragged_estimates_disag)
+# Clean imputed data and assign time stamp
+
+imputed_data <- imputed_data_final(imputeddata = imputed_data)
