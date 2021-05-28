@@ -152,7 +152,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_trend) {
   
   # Disaggregate linearint estimates
   
-  linearint_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = linearint_estimates_agg, countryinput = country_input, OC2input = OC2_input, FMfiltered = FM_filtered, missingyears = missing_years_incl_mixed, comment = "Linear interpolation estimate")
+  linearint_estimates_disag <- estimates_disaggregation(weights = subseries_weights_interpolated, mflags = mixed_flags, estimatesagg = linearint_estimates_agg, countryinput = country_input, OC2input = OC2_input, FMfiltered = FM_filtered, missingyears = missing_years_incl_mixed, comment = "Linear interpolation estimate")
 
 
 ### Historical average computation (aggregated, last X years)
