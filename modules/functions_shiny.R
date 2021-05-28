@@ -233,6 +233,101 @@ subseriesweights <- function(FMfiltered, yearsdataexclmixed, missingyearsseriesi
   
 }
 
+# Summarize weight of each subseries for each year (with interpolation when possible)
+
+subseriesweightsinterpolated <- function(FMfiltered, yearsdataexclmixed, missingyearsseriesinclmixed, yearsdata){
+  
+  subseries_weights_interpolated <- inner_join(FMfiltered,
+                                  FMfiltered %>%
+                                    filter(year %in% yearsdataexclmixed) %>%
+                                    group_by(year) %>%
+                                    summarise(value = sum(value)) %>%
+                                    rename(value_agg = value),
+                                  by = "year") %>% 
+    mutate(ratio = value/value_agg) %>%
+    select(subseries, year, value, ratio)
+  
+  # Drag subseries and associated weights to missing years
+  
+  for(i in missingyearsseriesinclmixed){
+    
+    ## series at tail of data
+    
+    # Dragging forwards
+    if(any(yearsdataexclmixed == (min(i)-1)) & !any(yearsdataexclmixed == (max(i)+1))){
+      
+      ref_year <- yearsdataexclmixed[which(yearsdataexclmixed == min(i)-1)]
+      ref_subseries <- pull(distinct(filter(subseries_weights_interpolated, year == ref_year), subseries), subseries)
+      
+      for(j in ref_subseries){
+        
+        subseries_weights_interpolated <- subseries_weights_interpolated %>% 
+          bind_rows(tibble(subseries = j, year = i, value = NA, ratio = subseries_weights_interpolated$ratio[(subseries_weights_interpolated$subseries == j & subseries_weights_interpolated$year == ref_year)]))
+        
+      }
+      
+    }
+    
+    ## series at head of data
+    
+    # Dragging backwards
+    if(any(yearsdataexclmixed == (max(i)+1)) & !any(yearsdataexclmixed == (min(i)-1))){
+      
+      ref_year <- yearsdataexclmixed[which(yearsdata == max(i)+1)]
+      ref_subseries <- pull(distinct(filter(subseries_weights_interpolated, year == ref_year), subseries), subseries)
+      
+      for(j in ref_subseries){
+        
+        subseries_weights_interpolated <- subseries_weights_interpolated %>% 
+          bind_rows(tibble(subseries = j, year = i, value = NA, ratio = subseries_weights_interpolated$ratio[(subseries_weights_interpolated$subseries == j & subseries_weights_interpolated$year == ref_year)]))
+        
+      }
+      
+    }
+    
+    ## series in between data
+    
+    # Dragging backwards
+    if(any(yearsdataexclmixed == (min(i)-1)) & any(yearsdataexclmixed == (max(i)+1))){
+      
+      ref_year_before <- yearsdataexclmixed[which(yearsdataexclmixed == min(i)-1)]
+      ref_subseries_before <- pull(distinct(filter(subseries_weights_interpolated, year == ref_year_before), subseries), subseries)
+      
+      ref_year_after <- yearsdataexclmixed[which(yearsdataexclmixed == max(i)+1)]
+      ref_subseries_after <- pull(distinct(filter(subseries_weights_interpolated, year == ref_year_after), subseries), subseries)
+      
+      # Linear interpolation of weights when the subseries before and after are identical
+      
+      if (identical(sort(ref_subseries_before), sort(ref_subseries_after))){
+        
+        for(j in i){
+          
+          for(h in ref_subseries_after){
+            
+            subseries_weights_interpolated <- subseries_weights_interpolated %>% 
+              bind_rows(tibble(subseries = h, year = j, value = NA, ratio = (subseries_weights_interpolated$ratio[(subseries_weights_interpolated$subseries == h & subseries_weights_interpolated$year == ref_year_before)] * (ref_year_after - j) + subseries_weights_interpolated$ratio[(subseries_weights_interpolated$subseries == h & subseries_weights_interpolated$year == ref_year_after)] * (j - ref_year_before))/(ref_year_after - ref_year_before)))
+            
+          }
+          
+        }
+        
+      } else
+        
+        # When subseries before and after aren't identical, just drag the weights backwards
+      
+        for(j in ref_subseries_after){
+          
+          subseries_weights_interpolated <- subseries_weights_interpolated %>% 
+            bind_rows(tibble(subseries = j, year = i, value = NA, ratio = subseries_weights_interpolated$ratio[(subseries_weights_interpolated$subseries == j & subseries_weights_interpolated$year == ref_year_after)]))
+          
+        }
+    }
+  }
+  
+  return(subseries_weights_interpolated)
+  
+}
+
 # Drag subseries and associated weights to missing years (subseries_weights_forward)
 
 subseriesweightsforward <- function(FMfiltered, yearsdataexclmixed, missingyearsseriesinclmixed){
@@ -1211,6 +1306,8 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
              title = "Visualization of current state of subseries imputation")
     
   }
+  
+  imputeddata$value <- as.integer(round(imputeddata$value, 0))
   
   return(imputeddata)
   
