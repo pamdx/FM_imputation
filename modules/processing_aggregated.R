@@ -4,15 +4,15 @@
 
 ##### LM ESTIMATION #####
 
-if(length(years_data_excl_mixed) >= obs_threshold_linreg & OC1_input %in% c("Aquaculture", "Marine fishing", "Inland fishing")) {
+if(length(years_data_excl_mixed) >= obs_threshold_linreg & OC2_input %in% c("Aquaculture", "Marine fishing", "Inland fishing")) {
   
   # Aggregate datasets
   
-  prod_agg <- prodagg(prodraw = prod_raw, countryinput = country_input, OC1input = OC1_input, startyear = start_year, endyear = end_year)
+  prod_agg <- prodagg(prodraw = prod_raw, countryinput = country_input, OC2input = OC2_input, startyear = start_year, endyear = end_year)
   
   ILO_labor_agg <- ILOlabor_agg(ILOlaborraw = ILO_labor_raw, countryinput = country_input, startyear = start_year, endyear = end_year)
   
-  if (country_input %in% OECD_countries & OC1_input == "Marine fishing") {
+  if (country_input %in% OECD_countries & OC2_input == "Marine fishing") {
    
     OECD_fleet_agg <- OECDfleet_agg(OECDfleetraw = OECD_fleet_raw, countryinput = country_input, startyear = start_year, endyear = end_year)
      
@@ -20,7 +20,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_linreg & OC1_input %in% c("Aqu
   
   # Generate dataset for regression
   
-  if (country_input %in% OECD_countries & OC1_input == "Marine fishing") {
+  if (country_input %in% OECD_countries & OC2_input == "Marine fishing") {
     
     reg_data <- regression_data_fleet(yearsall = years_all, FMagg = FM_agg, ILOlaboragg = ILO_labor_agg, prodagg = prod_agg, OECDfleetagg = OECD_fleet_agg)
     
@@ -28,17 +28,17 @@ if(length(years_data_excl_mixed) >= obs_threshold_linreg & OC1_input %in% c("Aqu
   
   # Linear regression summary plots
   
-  if (country_input %in% OECD_countries & OC1_input == "Marine fishing") {
+  if (country_input %in% OECD_countries & OC2_input == "Marine fishing") {
     
-    reg_variables_viz_fleet(regdata = reg_data, startyear = start_year, endyear = end_year, OC1input = OC1_input, countryinput = country_input)
+    reg_variables_viz_fleet(regdata = reg_data, startyear = start_year, endyear = end_year, OC2input = OC2_input, countryinput = country_input)
     
-  } else reg_variables_viz(regdata = reg_data, startyear = start_year, endyear = end_year, OC1input = OC1_input, countryinput = country_input)
+  } else reg_variables_viz(regdata = reg_data, startyear = start_year, endyear = end_year, OC2input = OC2_input, countryinput = country_input)
   
   # Regression
   
   reg_result <- if (reg_type == 1) {
     
-    if (country_input %in% OECD_countries & OC1_input == "Marine fishing") {
+    if (country_input %in% OECD_countries & OC2_input == "Marine fishing") {
       
       reg_automatic_fleet(regdata = reg_data, startyear = start_year, endyear = end_year)
       
@@ -78,12 +78,11 @@ if(length(years_data_excl_mixed) >= obs_threshold_linreg & OC1_input %in% c("Aqu
   
   if (reg_type == 1) {
 
-    reg_fit_viz(regdata = reg_data, bestfit = best_fit_LM, startyear = start_year, endyear = end_year, countryinput = country_input, OC1input = OC1_input, best_R2 = best_fit_LM_R2) 
-
+    reg_fit_viz(regdata = reg_data, bestfit = best_fit_LM, startyear = start_year, endyear = end_year, countryinput = country_input, OC2input = OC2_input, best_R2 = best_fit_LM_R2) 
     
   } else if (reg_type == 2) {
 
-    reg_fit_viz_manual(regdata = reg_data, startyear = start_year, endyear = end_year, countryinput = country_input, OC1input = OC1_input, best_R2 = best_fit_LM_R2)
+    reg_fit_viz_manual(regdata = reg_data, startyear = start_year, endyear = end_year, countryinput = country_input, OC2input = OC2_input, best_R2 = best_fit_LM_R2)
     
   }
   
@@ -93,7 +92,11 @@ if(length(years_data_excl_mixed) >= obs_threshold_linreg & OC1_input %in% c("Aqu
   
   # Disaggregate estimates
   
-  reg_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = reg_estimates_agg, countryinput = country_input, OC1input = OC1_input, FMfiltered = FM_filtered, missingyears = missing_years, comment = "Linear regression estimate")
+  if (best_fit_LM_R2 >= fit_threshold_reg) {
+   
+    reg_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = reg_estimates_agg, countryinput = country_input, OC2input = OC2_input, FMfiltered = FM_filtered, missingyears = missing_years_incl_mixed, comment = "Linear regression estimate")
+     
+  } else reg_estimates_disag <- tibble(subseries = character(), year = integer(), value = integer(), flag = character(), comment = character())
   
 } else reg_estimates_disag <- tibble(subseries = character(), year = integer(), value = integer(), flag = character(), comment = character())
 
@@ -107,7 +110,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_trend) {
   
   # Show a plot of the fitted trend and the data
   
-  trend_fit_viz(trenddata = trend_predictions_agg, startyear = start_year, endyear = end_year, countryinput = country_input, OC1input = OC1_input)
+  trend_fit_viz(trenddata = trend_predictions_agg, startyear = start_year, endyear = end_year, countryinput = country_input, OC2input = OC2_input)
   
   # Generate estimates for trend
   
@@ -115,7 +118,11 @@ if(length(years_data_excl_mixed) >= obs_threshold_trend) {
   
   # Disaggregate estimates
   
-  trend_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = trends_estimates_agg, countryinput = country_input, OC1input = OC1_input, FMfiltered = FM_filtered, missingyears = missing_years, comment = paste0("Polynomial trend estimate (", trend_predictions_agg$trend_type[1], ")"))
+  if (unique(trend_predictions_agg$r2adj) >= fit_threshold_trend) {
+  
+    trend_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = trends_estimates_agg, countryinput = country_input, OC2input = OC2_input, FMfiltered = FM_filtered, missingyears = missing_years_incl_mixed, comment = paste0("Polynomial trend estimate (", trend_predictions_agg$trend_type[1], ")"))
+      
+  } else trend_estimates_disag <- tibble(subseries = character(), year = integer(), value = integer(), flag = character(), comment = character())
   
 } else trend_estimates_disag <- tibble(subseries = character(), year = integer(), value = integer(), flag = character(), comment = character())
 
@@ -127,7 +134,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_trend) {
   
   # Disaggregate bdragged estimates
   
-  bdragged_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = bdragged_estimates_agg, countryinput = country_input, OC1input = OC1_input, FMfiltered = FM_filtered, missingyears = missing_years, comment = "Backward dragged estimate")
+  bdragged_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = bdragged_estimates_agg, countryinput = country_input, OC2input = OC2_input, FMfiltered = FM_filtered, missingyears = missing_years_incl_mixed, comment = "Backward dragged estimate")
 
 
 ### Forward dragged estimates computation
@@ -136,7 +143,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_trend) {
   
   # Disaggregate fdragged estimates
   
-  fdragged_estimates_disag <- estimates_disaggregation(weights = subseries_weights_forward, mflags = mixed_flags, estimatesagg = fdragged_estimates_agg, countryinput = country_input, OC1input = OC1_input, FMfiltered = FM_filtered, missingyears = missing_years, comment = "Forward dragged estimate")
+  fdragged_estimates_disag <- estimates_disaggregation(weights = subseries_weights_forward, mflags = mixed_flags, estimatesagg = fdragged_estimates_agg, countryinput = country_input, OC2input = OC2_input, FMfiltered = FM_filtered, missingyears = missing_years_incl_mixed, comment = "Forward dragged estimate")
 
 
 ### Linearly interpolated estimates computation
@@ -145,7 +152,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_trend) {
   
   # Disaggregate linearint estimates
   
-  linearint_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = linearint_estimates_agg, countryinput = country_input, OC1input = OC1_input, FMfiltered = FM_filtered, missingyears = missing_years, comment = "Linear interpolation estimate")
+  linearint_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = linearint_estimates_agg, countryinput = country_input, OC2input = OC2_input, FMfiltered = FM_filtered, missingyears = missing_years_incl_mixed, comment = "Linear interpolation estimate")
 
 
 ### Historical average computation (aggregated, last X years)
@@ -154,7 +161,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_trend) {
   
   # Disaggregate histavg estimates
   
-  histavg_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = histavg_estimates_agg, countryinput = country_input, OC1input = OC1_input, FMfiltered = FM_filtered, missingyears = missing_years, comment = "Historical average estimate")
+  histavg_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = histavg_estimates_agg, countryinput = country_input, OC2input = OC2_input, FMfiltered = FM_filtered, missingyears = missing_years_incl_mixed, comment = "Historical average estimate")
 
 
 ### Historical growth computation (aggregated, last X years)
@@ -163,7 +170,7 @@ if(length(years_data_excl_mixed) >= obs_threshold_trend) {
   
   # Disaggregate histgrowth estimates
   
-  histgrowth_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = histgrowth_estimates_agg, countryinput = country_input, OC1input = OC1_input, FMfiltered = FM_filtered, missingyears = missing_years, comment = "Historical growth estimate")
+  histgrowth_estimates_disag <- estimates_disaggregation(weights = subseries_weights, mflags = mixed_flags, estimatesagg = histgrowth_estimates_agg, countryinput = country_input, OC2input = OC2_input, FMfiltered = FM_filtered, missingyears = missing_years_incl_mixed, comment = "Historical growth estimate")
 
 
 ##### SUMMARY OF AGGREGATED ESTIMATIONS #####
@@ -174,13 +181,13 @@ final_estimates <- estimates_table(FMfiltered = FM_filtered, reg_estimates = reg
 
 # Create rainbow visualization for each estimator type
 
-estimator_viz(estimator = "reg", dataset = final_estimates, countryinput = country_input, OC1input = OC1_input)
-estimator_viz(estimator = "trend", dataset = final_estimates, countryinput = country_input, OC1input = OC1_input)
-estimator_viz(estimator = "linearint", dataset = final_estimates, countryinput = country_input, OC1input = OC1_input)
-estimator_viz(estimator = "histavg", dataset = final_estimates, countryinput = country_input, OC1input = OC1_input)
-estimator_viz(estimator = "histgrowth", dataset = final_estimates, countryinput = country_input, OC1input = OC1_input)
-estimator_viz(estimator = "bdragged", dataset = final_estimates, countryinput = country_input, OC1input = OC1_input)
-estimator_viz(estimator = "fdragged", dataset = final_estimates, countryinput = country_input, OC1input = OC1_input)
+estimator_viz(estimator = "reg", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(estimator = "trend", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(estimator = "linearint", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(estimator = "histavg", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(estimator = "histgrowth", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(estimator = "bdragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(estimator = "fdragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
 
 # Messages to user
 
