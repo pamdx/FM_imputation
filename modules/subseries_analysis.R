@@ -1,18 +1,18 @@
 # Basic FM filter
 
-FM_filtered <- FMfilter(FMraw = FM_raw, countryinput = country_input, OC1input = OC1_input, startyear = start_year, endyear = end_year)
+FM_filtered <- FMfilter(FMraw = FM_raw, countryinput = country_input, OC2input = OC2_input, startyear = start_year, endyear = end_year)
 
 subseries <- getsubseries(FMfiltered = FM_filtered)
 
 # Visualization of current estimates
 
-FM_exisiting_estimates <- FMexisitingestimates(FMraw = FM_raw, countryinput = country_input, OC1input = OC1_input, startyear = start_year, endyear = end_year)
+FM_exisiting_estimates <- FMexisitingestimates(FMraw = FM_raw, countryinput = country_input, OC2input = OC2_input, startyear = start_year, endyear = end_year)
 
-data_viz(data = FM_exisiting_estimates, countryinput = country_input, OC1input = OC1_input, title = "Visualization of current estimates")
+data_viz(data = FM_exisiting_estimates, countryinput = country_input, OC2input = OC2_input, title = "Visualization of current estimates")
 
 # Identify aggregated Country/sector/year data where official and estimated data are mixed
 
-mixed_flags <- mixedflags(FMraw = FM_raw, countryinput = country_input, OC1input = OC1_input, startyear = start_year, endyear = end_year)
+mixed_flags <- mixedflags(FMraw = FM_raw, countryinput = country_input, OC2input = OC2_input, startyear = start_year, endyear = end_year)
 
 # Identify missing years
 
