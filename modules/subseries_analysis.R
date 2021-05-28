@@ -31,6 +31,7 @@ subseries_break <- subseriesbreak(yearsdata = years_data, startyear = start_year
 # Summarize weight of each subseries for each year
 
 subseries_weights <- subseriesweights(FMfiltered = FM_filtered, yearsdataexclmixed = years_data_excl_mixed, missingyearsseriesinclmixed = missing_years_series_incl_mixed, yearsdata = years_data)
+subseries_weights_interpolated <- subseriesweightsinterpolated(FMfiltered = FM_filtered, yearsdataexclmixed = years_data_excl_mixed, missingyearsseriesinclmixed = missing_years_series_incl_mixed, yearsdata = years_data)
 subseries_weights_forward <- subseriesweightsforward(FMfiltered = FM_filtered, yearsdataexclmixed = years_data_excl_mixed, missingyearsseriesinclmixed = missing_years_series_incl_mixed)
 
 # Inspect discontinuities in subseries
