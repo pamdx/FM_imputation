@@ -13,8 +13,8 @@ country_names <- read_tsv("./inputs/country_names.txt")
 
 FM_raw <- read_tsv("./inputs/FM_DB.txt", col_types = cols(
   geographic_area = col_character(),
-  OC1 = col_character(),
   OC2 = col_character(),
+  OC3 = col_character(),
   working_time = col_character(),
   sex = col_character(),
   year = col_integer(),
