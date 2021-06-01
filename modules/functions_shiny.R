@@ -504,6 +504,7 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
+    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_prod <- ggplot(regdata, aes(x=year,y=prod_value, group = 1)) + 
@@ -513,6 +514,7 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
          subtitle = countryinput, 
          y="Tonnes") +
     scale_y_continuous(labels = addUnits) + 
+    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_labor <- ggplot(regdata, aes(x=year, y=labor_value, group = 1)) + 
@@ -522,6 +524,7 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
+    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   return(grid.arrange(plot_emp, plot_prod, plot_labor, ncol=2))
@@ -537,6 +540,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
+    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_prod <- ggplot(regdata, aes(x=year,y=prod_value, group = 1)) + 
@@ -546,6 +550,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
          subtitle = countryinput, 
          y="Tonnes") +
     scale_y_continuous(labels = addUnits) + 
+    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_labor <- ggplot(regdata, aes(x=year, y=labor_value, group = 1)) + 
@@ -555,6 +560,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
+    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_fleet <- ggplot(regdata, aes(x=year, y=fleet_value, group = 1)) + 
@@ -564,6 +570,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
          subtitle = countryinput, 
          y="Number of vessels") +
     scale_y_continuous(labels = addUnits) + 
+    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   return(grid.arrange(plot_emp, plot_prod, plot_labor, plot_fleet, ncol=2))
@@ -689,6 +696,7 @@ reg_fit_viz <- function(regdata, bestfit, startyear, endyear, countryinput, OC2i
       scale_x_discrete(breaks=seq(startyear, endyear, 5)) +
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from linear regression", caption = paste("Adjusted R-squared: ", best_R2)) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
+      scale_x_continuous(breaks = integer_breaks()) +
       theme(aspect.ratio = 3/4)
   ) 
   
@@ -703,6 +711,7 @@ reg_fit_viz_manual <- function(regdata, startyear, endyear, countryinput, OC2inp
       scale_x_discrete(breaks=seq(startyear, endyear, 5)) +
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from linear regression", caption = paste("Adjusted R-squared: ", best_R2)) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
+      scale_x_continuous(breaks = integer_breaks()) +
       theme(aspect.ratio = 3/4)
   ) 
   
@@ -784,6 +793,7 @@ trend_fit_viz <- function(trenddata, startyear, endyear, countryinput, OC2input)
       coord_cartesian(ylim=c(min(trenddata$value), max(trenddata$value))) +
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from polynomial trend", caption = paste("Adjusted R-squared: ", trenddata$r2adj[1])) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
+      scale_x_continuous(breaks = integer_breaks()) +
       theme(aspect.ratio = 3/4)
   ) 
   
