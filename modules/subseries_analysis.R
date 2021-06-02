@@ -42,6 +42,14 @@ discontinuous_subseries <- discontinuoussubseries(ss = subseries, FMfiltered = F
 
 subseries_table <- subseriestable(FMfiltered = FM_filtered, ss = subseries, yearsall = years_all)
 
-# Aggregate FM data for reg/trend estimates
+# Aggregate FM and PROD data for reg/trend estimates, productivity charts
 
 FM_agg <- FMagg(FMfiltered = FM_filtered, yearsdataexclmixed = years_data_excl_mixed)
+
+prod_agg <- prodagg(prodraw = prod_raw, countryinput = country_input, OC2input = OC2_input, startyear = start_year, endyear = end_year)
+
+# Calculate productivity with existing estimates
+
+productivity_existing <- productivity_table(FM_exisiting_estimates %>%
+                                              group_by(year) %>%
+                                              summarise(emp_value = sum(value)), prod_agg)
