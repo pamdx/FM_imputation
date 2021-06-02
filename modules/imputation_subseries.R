@@ -9,3 +9,5 @@ imputed_data <- subseries_imputation(ss = subseries, imputeddata = imputed_data,
 # Clean imputed data and assign time stamp
 
 imputed_data <- imputed_data_final(imputeddata = imputed_data)
+
+imputation_type <- "Subseries-level imputation"
