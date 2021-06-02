@@ -412,7 +412,10 @@ subseriestable <- function(FMfiltered, ss, yearsall){
   FMfiltered %>% 
     select(subseries, year, value) %>%
     right_join(FMfiltered %>% expand(subseries, yearsall) %>% rename(year = yearsall)) %>%
-    spread(year, value)
+    spread(year, value) %>%
+    separate(subseries, into = c("geographic_area", "OC2", "OC3", "working_time", "sex"), sep = "_") %>%
+    unite(subseries, c("OC3", "working_time", "sex"), sep = " | ") %>%
+    select(subseries:last_col())
   
 }
 
@@ -439,6 +442,15 @@ prodagg <- function(prodraw, countryinput, OC2input, startyear, endyear){
     filter(between(year, startyear, endyear)) %>%
     group_by(year) %>%
     summarise(prod_value = sum(prod_value))
+}
+
+# Function to generate table of productivities
+
+productivity_table <- function(emp, prod){
+  
+  left_join(emp, prod, by = "year") %>%
+    mutate(productivity = prod_value / emp_value)
+  
 }
 
 # Function to aggregate ILO labor data
