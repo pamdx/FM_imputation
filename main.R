@@ -4,8 +4,6 @@ rm(list=ls())
 
 ### Load packages
 
-# library(tidyverse)
-
 library(dplyr)
 library(ggplot2)
 library(readr)
@@ -45,13 +43,13 @@ obs_threshold_linreg <- round(length(years_all) * share_valid_reg)
 reg_type <- 1 # 1 = automatic, 2 = manual
 trend <- seq(start_year:end_year)
 reg_dynamic <- emp_value ~ trend + prod_value + labor_value # Choose independent variables from: trend, prod_value, labor_value, fleet_value (separated by "+")
-fit_threshold_reg <- 0.85
+fit_threshold_reg <- 0.1
 
   # Trend
 
 share_valid_trend <- 0.1
 obs_threshold_trend <- round(length(years_all) * share_valid_trend)
-fit_threshold_trend <- 0.85
+fit_threshold_trend <- 0.1
 
   # LBFH
 
@@ -72,6 +70,6 @@ source("./modules/imputation_aggregated.R")
 
 source("./modules/imputation_subseries.R")
 
-# Final data export and visualization
+# Final data export and report generation
 
 source("./modules/final_data_export_viz.R")
