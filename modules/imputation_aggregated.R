@@ -19,3 +19,5 @@ imputed_data <- if (agg_imputation_type == 1) {
 # Clean imputed data and assign time stamp
 
 imputed_data <- imputed_data_final(imputeddata = imputed_data)
+
+imputation_type <- "Aggregated imputation"
