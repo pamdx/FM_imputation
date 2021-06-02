@@ -8,8 +8,6 @@ if(length(years_data_excl_mixed) >= obs_threshold_linreg & OC2_input %in% c("Aqu
   
   # Aggregate datasets
   
-  prod_agg <- prodagg(prodraw = prod_raw, countryinput = country_input, OC2input = OC2_input, startyear = start_year, endyear = end_year)
-  
   ILO_labor_agg <- ILOlabor_agg(ILOlaborraw = ILO_labor_raw, countryinput = country_input, startyear = start_year, endyear = end_year)
   
   if (country_input %in% OECD_countries & OC2_input == "Marine fishing") {
