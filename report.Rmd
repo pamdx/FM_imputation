@@ -1,0 +1,276 @@
+---
+title: | 
+ | Employment Imputation Report:
+ | `r paste(country_input, '-', OC2_input)`
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# {.tabset .tabset-pills}
+
+## Pre-imputation {.tabset}
+
+### Current estimates
+
+```{r existing estimates, echo = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left"}
+
+# Save current estimates chart
+
+data_viz(data = FM_exisiting_estimates, countryinput = country_input, OC2input = OC2_input, title = "Visualization of current estimates")
+
+```
+
+### Production and productivity
+
+```{r existing prod, echo = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left"}
+
+ggplot(productivity_existing, aes(x = year, y = prod_value, group = 1)) + 
+  geom_line() +
+  labs(title = paste("Visualization of production"), 
+       subtitle = paste(OC2_input, "|", country_input), 
+       y = "Tonnes",
+       x = "Year") +
+  scale_y_continuous(labels = addUnits) + 
+  scale_x_continuous(breaks = integer_breaks()) +
+  theme(aspect.ratio = 3/4)
+
+ggplot(productivity_existing, aes(x = year, y = productivity, group = 1)) + 
+  geom_line() +
+  labs(title = paste("Visualization of productivity"), 
+       subtitle = paste(OC2_input, "|", country_input), 
+       y = "Tonnes/person",
+       x = "Year") +
+  scale_y_continuous(labels = addUnits) + 
+  scale_x_continuous(breaks = integer_breaks()) +
+  theme(aspect.ratio = 3/4)
+
+```
+
+### Subseries table
+
+```{r subseries table, echo = FALSE, results = 'asis', message = FALSE}
+
+library(knitr)
+library(kableExtra)
+
+options(knitr.kable.NA = '')
+kable(subseries_table, caption =  "Subseries table of official data", format.args = list(big.mark = " ",
+  scientific = FALSE)) %>%
+  column_spec(1, bold = T, width_min = "3.2in") %>% 
+  column_spec(2:ncol(subseries_table), width_min = "1in") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  scroll_box(width = "1000px")
+
+```
+
+## Imputation {.tabset}
+
+```{r imputation type, echo = FALSE, message = FALSE}
+
+paste("Imputation type: ", imputation_type)
+
+```
+
+### Linear regression
+
+#### Summary plots
+
+```{r reg imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(reg_estimates_disag > 0)) {
+
+# Linear regression summary plots
+
+if (country_input %in% OECD_countries & OC2_input == "Marine fishing") {
+
+reg_variables_viz_fleet(regdata = reg_data, startyear = start_year, endyear = end_year, OC2input = OC2_input, countryinput = country_input)
+
+} else reg_variables_viz(regdata = reg_data, startyear = start_year, endyear = end_year, OC2input = OC2_input, countryinput = country_input)
+
+}
+
+```
+
+#### Regression results
+
+```{r reg imputation results, echo = FALSE, results='asis', warning = FALSE, message = FALSE, eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(reg_estimates_disag > 0)) {
+
+# Regression results
+
+stargazer(reg_result,  type = "html", title = "Results of linear models", align = TRUE, single.row = TRUE, notes="<span>&#42;&#42;&#42;</span>: p<0.01; <span>&#42;&#42;</span>: p<0.05; <span>&#42;</span>: p<0.1", notes.append=F) 
+  
+}
+
+```
+
+#### Fit of LM over data
+
+```{r reg imputation fit, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(reg_estimates_disag > 0)) {
+
+# Visualize fit of LM over data
+
+if (reg_type == 1) {
+
+reg_fit_viz(regdata = reg_data, bestfit = best_fit_LM, startyear = start_year, endyear = end_year, countryinput = country_input, OC2input = OC2_input, best_R2 = best_fit_LM_R2) 
+
+} else if (reg_type == 2) {
+
+reg_fit_viz_manual(regdata = reg_data, startyear = start_year, endyear = end_year, countryinput = country_input, OC2input = OC2_input, best_R2 = best_fit_LM_R2)
+
+}
+
+}
+
+```
+
+#### Disaggregated estimates
+
+```{r reg imputation disag, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(reg_estimates_disag > 0)) {
+
+estimator_viz(estimator = "reg", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+   
+}
+
+```
+
+### Polynomial trend
+
+```{r trend imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(trend_estimates_disag > 0)) {
+    
+  # Show a plot of the fitted trend and the data
+  
+  trend_fit_viz(trenddata = trend_predictions_agg, startyear = start_year, endyear = end_year, countryinput = country_input, OC2input = OC2_input)
+  
+  estimator_viz(estimator = "trend", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+   
+}
+
+```
+
+### Linear interpolation
+
+```{r linearint imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(linearint_estimates_disag > 0)) {
+
+estimator_viz(estimator = "linearint", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+
+}
+
+```
+
+### Historical average
+
+```{r histavg imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(histavg_estimates_disag > 0)) {
+
+estimator_viz(estimator = "histavg", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+
+}
+
+```
+
+### Historical growth
+
+```{r histgrowth imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(histgrowth_estimates_disag > 0)) {
+
+estimator_viz(estimator = "histgrowth", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+
+}
+
+```
+
+### Backwards dragged
+
+```{r bdragged imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(bdragged_estimates_disag > 0)) {
+
+estimator_viz(estimator = "bdragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+
+}
+
+```
+
+### Forwards dragged
+
+```{r fdragged imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+
+if (nrow(fdragged_estimates_disag > 0)) {
+
+estimator_viz(estimator = "fdragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+
+}
+
+```
+
+## Post-imputation {.tabset}
+
+### Final estimates
+
+```{r imputed estimates, echo = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left"}
+
+data_viz(data = imputed_data, countryinput = country_input, OC2input = OC2_input, title = "Visualization of final imputed data")
+
+```
+
+### Production and productivity
+
+```{r imputed prod, echo = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left"}
+
+ggplot(productivity_imputed, aes(x = year, y = prod_value, group = 1)) + 
+  geom_line() +
+  labs(title = paste("Visualization of production"), 
+       subtitle = paste(OC2_input, "|", country_input), 
+       y = "Tonnes",
+       x = "Year") +
+  scale_y_continuous(labels = addUnits) + 
+  scale_x_continuous(breaks = integer_breaks()) +
+  theme(aspect.ratio = 3/4)
+
+ggplot(productivity_imputed, aes(x = year, y = productivity, group = 1)) + 
+  geom_line() +
+  labs(title = paste("Visualization of productivity"), 
+       subtitle = paste(OC2_input, "|", country_input), 
+       y = "Tonnes/person",
+       x = "Year") +
+  scale_y_continuous(labels = addUnits) + 
+  scale_x_continuous(breaks = integer_breaks()) +
+  theme(aspect.ratio = 3/4)
+
+```
+
+### Comparison table
+
+```{r echo = FALSE, results = 'asis', message = FALSE}
+
+# Create comparison table between original data and processed data
+
+ctable = compare_df(imputed_data %>%
+                      select(geographic_area:comment) %>%
+                      arrange(geographic_area, year, OC2, OC3, working_time, sex), 
+                    FM_exisiting_estimates %>% 
+                      select(geographic_area, OC2, OC3, working_time, sex, year, value, flag, comment) %>%
+                      arrange(geographic_area, year, OC2, OC3, working_time, sex), 
+                    c("geographic_area", "OC2", "OC3", "working_time", "sex", "year"))
+
+# Output HTML table
+
+create_output_table(
+  ctable,
+  output_type = "html",
+  file_name = NULL,
+  limit = 1000)
+
+```
