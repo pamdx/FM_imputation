@@ -20,32 +20,6 @@ data_viz(data = FM_exisiting_estimates, countryinput = country_input, OC2input =
 
 ```
 
-### Production and productivity
-
-```{r existing prod, echo = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left"}
-
-ggplot(productivity_existing, aes(x = year, y = prod_value, group = 1)) + 
-  geom_line() +
-  labs(title = paste("Visualization of production"), 
-       subtitle = paste(OC2_input, "|", country_input), 
-       y = "Tonnes",
-       x = "Year") +
-  scale_y_continuous(labels = addUnits) + 
-  scale_x_continuous(breaks = integer_breaks()) +
-  theme(aspect.ratio = 3/4)
-
-ggplot(productivity_existing, aes(x = year, y = productivity, group = 1)) + 
-  geom_line() +
-  labs(title = paste("Visualization of productivity"), 
-       subtitle = paste(OC2_input, "|", country_input), 
-       y = "Tonnes/person",
-       x = "Year") +
-  scale_y_continuous(labels = addUnits) + 
-  scale_x_continuous(breaks = integer_breaks()) +
-  theme(aspect.ratio = 3/4)
-
-```
-
 ### Subseries table
 
 ```{r subseries table, echo = FALSE, results = 'asis', message = FALSE}
@@ -215,7 +189,7 @@ estimator_viz(estimator = "fdragged", dataset = final_estimates, countryinput = 
 
 ```
 
-## Post-imputation {.tabset}
+## Post-imputation {.tabset .active}
 
 ### Final estimates
 
@@ -229,7 +203,9 @@ data_viz(data = imputed_data, countryinput = country_input, OC2input = OC2_input
 
 ```{r imputed prod, echo = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left"}
 
-ggplot(productivity_imputed, aes(x = year, y = prod_value, group = 1)) + 
+if (OC2_input == "Aquaculture" | OC2_input == "Marine fishing" | OC2_input == "Inland fishing") {
+ 
+print(ggplot(productivity_imputed, aes(x = year, y = prod_value, group = 1)) + 
   geom_line() +
   labs(title = paste("Visualization of production"), 
        subtitle = paste(OC2_input, "|", country_input), 
@@ -237,17 +213,23 @@ ggplot(productivity_imputed, aes(x = year, y = prod_value, group = 1)) +
        x = "Year") +
   scale_y_continuous(labels = addUnits) + 
   scale_x_continuous(breaks = integer_breaks()) +
-  theme(aspect.ratio = 3/4)
+  theme(aspect.ratio = 3/4))
 
-ggplot(productivity_imputed, aes(x = year, y = productivity, group = 1)) + 
-  geom_line() +
+print(ggplot(left_join(productivity_imputed, productivity_existing, by = "year") %>%
+         rename(productivity_imputed = productivity.x, productivity_existing = productivity.y) %>%
+         select(year, productivity_imputed, productivity_existing) %>%
+         pivot_longer(c(productivity_imputed, productivity_existing), names_to = "variable", values_to = "value")
+       , aes(x = year, y = value, group = 1)) + 
+  geom_point(aes(color = variable), alpha = 0.5, size = 2) +
   labs(title = paste("Visualization of productivity"), 
        subtitle = paste(OC2_input, "|", country_input), 
        y = "Tonnes/person",
        x = "Year") +
   scale_y_continuous(labels = addUnits) + 
   scale_x_continuous(breaks = integer_breaks()) +
-  theme(aspect.ratio = 3/4)
+  theme(aspect.ratio = 3/4))
+   
+}
 
 ```
 
