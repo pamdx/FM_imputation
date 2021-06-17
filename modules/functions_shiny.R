@@ -6,8 +6,8 @@ FMfilter <- function(FMraw, countryinput, OC2input, startyear, endyear){
     filter(geographic_area == countryinput) %>% # In Shiny, replace by input from dropdown menu
     filter(OC2 == OC2input) %>%
     filter(between(year, startyear, endyear)) %>%
-    filter(!is.na(value)) %>%
-    filter(is.na(flag) | flag == "A" | flag == "R") %>% # Make dynamic input in Shiny
+    filter(!is.na(value) | !is.na(flag)) %>%
+    filter(is.na(flag) | flag == "T" | flag == "R" | flag == "Q" | flag == "I" | flag == "P") %>% # Make dynamic input in Shiny
     unite("subseries", geographic_area, OC2, OC3, working_time, sex, sep = "_", remove = FALSE) %>%
     select(geographic_area:comment, subseries)
   
@@ -41,8 +41,8 @@ data_viz <- function(data, countryinput, OC2input, title){
 
 data <- data  %>%
            unite(subseries, c("OC3", "working_time", "sex"), sep = " | ") %>%
-           mutate(estimate = case_when(flag == "B" |  flag == "F" |  flag == "P" |  flag == "E" |  flag == "L"  ~ TRUE,
-                                       is.na(flag) | flag == "A"  ~ FALSE))
+           mutate(estimate = case_when(flag == "E"  ~ TRUE,
+                                       is.na(flag) | flag == "T" | flag == "R" | flag == "Q" | flag == "I" | flag == "P"  ~ FALSE))
 
   print(
     ggplot(data, aes(x = year, y = value, fill = subseries, alpha = estimate)) +
@@ -75,7 +75,7 @@ mixedflags <- function(FMraw, countryinput, OC2input, startyear, endyear){
   })
   
   dropflag <- sapply(flagtest, function(i){
-    append(dropflag, ifelse(NA %in% i & "B" %in% i | NA %in% i & "E" %in% i | NA %in% i & "F" %in% i | NA %in% i & "L" %in% i | NA %in% i & "P" %in% i, "1", "0"))
+    append(dropflag, ifelse(NA %in% i & "E" %in% i , "1", "0"))
   })
   
   FM_mixflags["dropflag"] <- dropflag
@@ -1179,7 +1179,7 @@ aggregated_imputation <- function(finalestimates, missingyears, imputeddata, reg
       )) %>%
     select(year, estimator) %>%
     bind_rows(FMexisitingestimates %>%
-                filter(flag == "B" | flag == "F" | flag == "L" | flag == "P" | flag == "E") %>%
+                filter(flag == "E") %>%
                 select(year) %>%
                 mutate(estimator = "[Keep existing estimates]"))
   
