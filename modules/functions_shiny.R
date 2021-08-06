@@ -49,7 +49,7 @@ data <- data  %>%
       geom_bar(stat="identity", colour="white") +
       labs(title = title, subtitle = paste(countryinput, "|", OC2_input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
       scale_alpha_discrete(range = c(0.35, 1)) +
-      guides(alpha = FALSE) +
+      guides(alpha = "none") +
       scale_y_continuous(labels = addUnits) + 
       scale_x_continuous(breaks = integer_breaks()) +
       theme(aspect.ratio = 3/4)
@@ -597,23 +597,49 @@ reg_automatic <- function(regdata, startyear, endyear){
   
   trend <- seq(startyear:endyear)
   
-  try(fit_emp_1 <- lm(
-    emp_value ~ trend + prod_value + labor_value,
-    data = reg_data_ts), silent = TRUE)
+  results_list <- vector(mode = "list", length = 4)
   
-  try(fit_emp_2 <- lm(
-    emp_value ~ prod_value + labor_value,
-    data = reg_data_ts), silent = TRUE)
+  if (length(na.omit(regdata$prod_value)) > 0 & length(na.omit(regdata$labor_value)) > 0) {
+   
+    try(fit_emp_1 <- lm(
+      emp_value ~ trend + prod_value + labor_value,
+      data = reg_data_ts), silent = TRUE)
+    
+    results_list[[1]] <- fit_emp_1
+    
+  }
   
-  try(fit_emp_3 <- lm(
-    emp_value ~ trend + prod_value,
-    data = reg_data_ts), silent = TRUE)
+  if (length(na.omit(regdata$prod_value)) > 0 & length(na.omit(regdata$labor_value)) > 0) {
+   
+    try(fit_emp_2 <- lm(
+      emp_value ~ prod_value + labor_value,
+      data = reg_data_ts), silent = TRUE)
+    
+    results_list[[2]] <- fit_emp_2
+    
+  }
   
-  try(fit_emp_4 <- lm(
-    emp_value ~ prod_value,
-    data = reg_data_ts), silent = TRUE) 
+  if (length(na.omit(regdata$prod_value)) > 0) {
+   
+    try(fit_emp_3 <- lm(
+      emp_value ~ trend + prod_value,
+      data = reg_data_ts), silent = TRUE)
+    
+    results_list[[3]] <- fit_emp_3
+    
+  }
   
-  return(list(fit_emp_1, fit_emp_2, fit_emp_3, fit_emp_4))
+  if (length(na.omit(regdata$prod_value)) > 0) {
+   
+    try(fit_emp_4 <- lm(
+      emp_value ~ prod_value,
+      data = reg_data_ts), silent = TRUE) 
+    
+    results_list[[4]] <- fit_emp_4
+    
+  }
+  
+  return(results_list[lengths(results_list) != 0])
   
 }
 
@@ -623,23 +649,49 @@ reg_automatic_fleet <- function(regdata, startyear, endyear){
   
   trend <- seq(startyear:endyear)
   
-  try(fit_emp_1 <- lm(
-    emp_value ~ trend + prod_value + labor_value + fleet_value,
-    data = reg_data_ts), silent = TRUE)
+  results_list <- vector(mode = "list", length = 4)
   
-  try(fit_emp_2 <- lm(
-    emp_value ~ prod_value + labor_value + fleet_value,
-    data = reg_data_ts), silent = TRUE)
+  if (length(na.omit(regdata$prod_value)) > 0 & length(na.omit(regdata$labor_value)) > 0 & length(na.omit(regdata$fleet_value)) > 0) {
+    
+    try(fit_emp_1 <- lm(
+      emp_value ~ trend + prod_value + labor_value + fleet_value,
+      data = reg_data_ts), silent = TRUE)
+    
+    results_list[[1]] <- fit_emp_1
+    
+  }
   
-  try(fit_emp_3 <- lm(
-    emp_value ~ trend + prod_value,
-    data = reg_data_ts), silent = TRUE)
+  if (length(na.omit(regdata$prod_value)) > 0 & length(na.omit(regdata$labor_value)) > 0 & length(na.omit(regdata$fleet_value)) > 0) {
+   
+    try(fit_emp_2 <- lm(
+      emp_value ~ prod_value + labor_value + fleet_value,
+      data = reg_data_ts), silent = TRUE)
+     
+    results_list[[2]] <- fit_emp_2
+    
+  }
   
-  try(fit_emp_4 <- lm(
-    emp_value ~ prod_value,
-    data = reg_data_ts), silent = TRUE) 
+  if (length(na.omit(regdata$prod_value)) > 0) {
+   
+    try(fit_emp_3 <- lm(
+      emp_value ~ trend + prod_value,
+      data = reg_data_ts), silent = TRUE)
+     
+    results_list[[3]] <- fit_emp_3
+    
+  }
   
-  return(list(fit_emp_1, fit_emp_2, fit_emp_3, fit_emp_4))
+  if (length(na.omit(regdata$prod_value)) > 0) {
+   
+    try(fit_emp_4 <- lm(
+      emp_value ~ prod_value,
+      data = reg_data_ts), silent = TRUE)
+     
+    results_list[[4]] <- fit_emp_4
+    
+  }
+  
+  return(results_list[lengths(results_list) != 0])
   
 }
 
@@ -669,12 +721,15 @@ reg_result_summary <- function(regresult){
 
 reg_auto_best_fit <- function(regresult){
   
-  LM1_r2 <- summary(regresult[[1]])$adj.r.squared
-  LM2_r2 <- summary(regresult[[2]])$adj.r.squared
-  LM3_r2 <- summary(regresult[[3]])$adj.r.squared
-  LM4_r2 <- summary(regresult[[4]])$adj.r.squared
+  rsquared <- c()
   
-  return(c("1", "2", "3", "4")[which.max(c(LM1_r2, LM2_r2, LM3_r2, LM4_r2))])
+  for (i in regresult) {
+    
+    rsquared <- c(rsquared, summary(i)$adj.r.squared)
+    
+  }
+  
+  return(paste(which.max(rsquared)))
   
 }
 
@@ -1234,7 +1289,7 @@ aggregated_imputation <- function(finalestimates, missingyears, imputeddata, reg
            
            "[Keep existing estimates]" = imputeddata <- imputeddata %>% 
              bind_rows(FMexisitingestimates %>%
-                         filter(year %in% i) %>%
+                         filter(year %in% i, flag == "E") %>%
                          select(subseries, year, value, flag, comment))
            
     )
