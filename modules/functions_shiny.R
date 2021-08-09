@@ -511,32 +511,29 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
   
   plot_emp <- ggplot(regdata, aes(x=year,y=emp_value, group = 1)) + 
     geom_line() + 
-    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    scale_x_continuous(breaks = integer_breaks()) +
     labs(title = paste(OC2input, " employment (FAO data)"), 
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
-    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_prod <- ggplot(regdata, aes(x=year,y=prod_value, group = 1)) + 
     geom_line() + 
-    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    scale_x_continuous(breaks = integer_breaks()) +
     labs(title = paste(OC2input, " production (FAO data)"), 
          subtitle = countryinput, 
          y="Tonnes") +
     scale_y_continuous(labels = addUnits) + 
-    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_labor <- ggplot(regdata, aes(x=year, y=labor_value, group = 1)) + 
     geom_line() + 
-    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    scale_x_continuous(breaks = integer_breaks()) +
     labs(title ="Labor force (ILO data)", 
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
-    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   return(grid.arrange(plot_emp, plot_prod, plot_labor, ncol=2))
@@ -547,42 +544,38 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
   
   plot_emp <- ggplot(regdata, aes(x=year,y=emp_value, group = 1)) + 
     geom_line() + 
-    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    scale_x_continuous(breaks = integer_breaks()) +
     labs(title = paste(OC2input, " employment (FAO data)"), 
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
-    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_prod <- ggplot(regdata, aes(x=year,y=prod_value, group = 1)) + 
     geom_line() + 
-    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    scale_x_continuous(breaks = integer_breaks()) +
     labs(title = paste(OC2input, " production (FAO data)"), 
          subtitle = countryinput, 
          y="Tonnes") +
     scale_y_continuous(labels = addUnits) + 
-    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_labor <- ggplot(regdata, aes(x=year, y=labor_value, group = 1)) + 
     geom_line() + 
-    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    scale_x_continuous(breaks = integer_breaks()) +
     labs(title ="Labor force (ILO data)", 
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
-    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   plot_fleet <- ggplot(regdata, aes(x=year, y=fleet_value, group = 1)) + 
     geom_line() + 
-    scale_x_discrete(breaks = round(seq(startyear, endyear, by = 5),1)) +
+    scale_x_continuous(breaks = integer_breaks()) +
     labs(title ="Fleet (OECD data)", 
          subtitle = countryinput, 
          y="Number of vessels") +
     scale_y_continuous(labels = addUnits) + 
-    scale_x_continuous(breaks = integer_breaks()) +
     theme(aspect.ratio = 3/4)
   
   return(grid.arrange(plot_emp, plot_prod, plot_labor, plot_fleet, ncol=2))
@@ -760,7 +753,6 @@ reg_fit_viz <- function(regdata, bestfit, startyear, endyear, countryinput, OC2i
     ggplot(regdata, aes(x = year, group = 1)) +
       geom_point(aes(y = emp_value, col = "Original data")) +
       geom_line(aes(y = predictions, col = paste0("LM", bestfit, (" (best fit)")))) +
-      scale_x_discrete(breaks=seq(startyear, endyear, 5)) +
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from linear regression", caption = paste("Adjusted R-squared: ", best_R2)) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
       scale_x_continuous(breaks = integer_breaks()) +
@@ -775,10 +767,10 @@ reg_fit_viz_manual <- function(regdata, startyear, endyear, countryinput, OC2inp
     ggplot(regdata, aes(x = year, group = 1)) +
       geom_point(aes(y = emp_value, col = "Original data")) +
       geom_line(aes(y = predictions, col = "User-defined LM")) +
-      scale_x_discrete(breaks=seq(startyear, endyear, 5)) +
+      scale_x_continuous(breaks = integer_breaks()) +
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from linear regression", caption = paste("Adjusted R-squared: ", best_R2)) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
-      scale_x_continuous(breaks = integer_breaks()) +
+      
       theme(aspect.ratio = 3/4)
   ) 
   
@@ -856,11 +848,11 @@ trend_fit_viz <- function(trenddata, startyear, endyear, countryinput, OC2input)
     ggplot(trenddata, aes(x = year, group = 1)) +
       geom_point(aes(y = value, col = "Original data")) +
       geom_line(aes(y = predictions, col = paste(trend_type[1], "(best fit)"))) +
-      scale_x_discrete(breaks=seq(startyear, endyear, 5)) +
+      scale_x_continuous(breaks = integer_breaks()) +
       coord_cartesian(ylim=c(min(trenddata$value), max(trenddata$value))) +
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from polynomial trend", caption = paste("Adjusted R-squared: ", trenddata$r2adj[1])) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
-      scale_x_continuous(breaks = integer_breaks()) +
+      
       theme(aspect.ratio = 3/4)
   ) 
   

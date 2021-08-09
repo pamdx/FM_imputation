@@ -12,7 +12,9 @@ output: html_document
 
 ### Current estimates
 
-```{r existing estimates, echo = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left"}
+```{r existing estimates, echo = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left"}
+
+theme_update(text = element_text(size = 15))
 
 # Save current estimates chart
 
@@ -49,7 +51,7 @@ paste("Imputation type: ", imputation_type)
 
 #### Summary plots
 
-```{r reg imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+```{r reg imputation, echo = FALSE, message = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
 
 if (nrow(reg_estimates_disag > 0)) {
 
@@ -81,7 +83,7 @@ stargazer(reg_result,  type = "html", title = "Results of linear models", align 
 
 #### Fit of LM over data
 
-```{r reg imputation fit, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+```{r reg imputation fit, echo = FALSE, message = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
 
 if (nrow(reg_estimates_disag > 0)) {
 
@@ -103,7 +105,7 @@ reg_fit_viz_manual(regdata = reg_data, startyear = start_year, endyear = end_yea
 
 #### Disaggregated estimates
 
-```{r reg imputation disag, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+```{r reg imputation disag, echo = FALSE, message = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
 
 if (nrow(reg_estimates_disag > 0)) {
 
@@ -115,7 +117,7 @@ estimator_viz(estimator = "reg", dataset = final_estimates, countryinput = count
 
 ### Polynomial trend
 
-```{r trend imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+```{r trend imputation, echo = FALSE, message = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
 
 if (nrow(trend_estimates_disag > 0)) {
     
@@ -131,7 +133,7 @@ if (nrow(trend_estimates_disag > 0)) {
 
 ### Linear interpolation
 
-```{r linearint imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+```{r linearint imputation, echo = FALSE, message = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
 
 if (nrow(linearint_estimates_disag > 0)) {
 
@@ -143,7 +145,7 @@ estimator_viz(estimator = "linearint", dataset = final_estimates, countryinput =
 
 ### Historical average
 
-```{r histavg imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+```{r histavg imputation, echo = FALSE, message = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
 
 if (nrow(histavg_estimates_disag > 0)) {
 
@@ -155,7 +157,7 @@ estimator_viz(estimator = "histavg", dataset = final_estimates, countryinput = c
 
 ### Historical growth
 
-```{r histgrowth imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+```{r histgrowth imputation, echo = FALSE, message = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
 
 if (nrow(histgrowth_estimates_disag > 0)) {
 
@@ -167,7 +169,7 @@ estimator_viz(estimator = "histgrowth", dataset = final_estimates, countryinput 
 
 ### Backwards dragged
 
-```{r bdragged imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+```{r bdragged imputation, echo = FALSE, message = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
 
 if (nrow(bdragged_estimates_disag > 0)) {
 
@@ -179,7 +181,7 @@ estimator_viz(estimator = "bdragged", dataset = final_estimates, countryinput = 
 
 ### Forwards dragged
 
-```{r fdragged imputation, echo = FALSE, message = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
+```{r fdragged imputation, echo = FALSE, message = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left", eval = imputation_type == "Aggregated imputation"}
 
 if (nrow(fdragged_estimates_disag > 0)) {
 
@@ -193,7 +195,7 @@ estimator_viz(estimator = "fdragged", dataset = final_estimates, countryinput = 
 
 ### Final estimates
 
-```{r imputed estimates, echo = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left"}
+```{r imputed estimates, echo = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left"}
 
 data_viz(data = imputed_data, countryinput = country_input, OC2input = OC2_input, title = "Visualization of final imputed data")
 
@@ -201,7 +203,7 @@ data_viz(data = imputed_data, countryinput = country_input, OC2input = OC2_input
 
 ### Production and productivity
 
-```{r imputed prod, echo = FALSE, dpi = 96, fig.asp = 0.75, fig.width = 10, message = FALSE, warning = FALSE, fig.align="left"}
+```{r imputed prod, echo = FALSE, dpi = 72, fig.asp = 0.75, fig.width = 12.638, fig.retina = 1, message = FALSE, warning = FALSE, fig.align="left"}
 
 if (OC2_input == "Aquaculture" | OC2_input == "Marine fishing" | OC2_input == "Inland fishing") {
  
@@ -245,7 +247,8 @@ ctable = compare_df(imputed_data %>%
                     FM_exisiting_estimates %>% 
                       select(geographic_area, OC2, OC3, working_time, sex, year, value, flag, comment) %>%
                       arrange(geographic_area, year, OC2, OC3, working_time, sex), 
-                    c("geographic_area", "OC2", "OC3", "working_time", "sex", "year"))
+                    c("geographic_area", "OC2", "OC3", "working_time", "sex", "year"),
+                    stop_on_error = FALSE)
 
 # Output HTML table
 
