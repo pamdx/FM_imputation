@@ -7,7 +7,7 @@ FMfilter <- function(FMraw, countryinput, OC2input, startyear, endyear){
     filter(OC2 == OC2input) %>%
     filter(between(year, startyear, endyear)) %>%
     filter(!is.na(value) | !is.na(flag)) %>%
-    filter(is.na(flag) | flag == "T" | flag == "R" | flag == "Q" | flag == "I" | flag == "P") %>% # Make dynamic input in Shiny
+    filter(is.na(flag) | flag == "T" | flag == "R" | flag == "Q" | flag == "M" | flag == "I" | flag == "P") %>% # Make dynamic input in Shiny
     unite("subseries", geographic_area, OC2, OC3, working_time, sex, sep = "_", remove = FALSE) %>%
     select(geographic_area:comment, subseries)
   
