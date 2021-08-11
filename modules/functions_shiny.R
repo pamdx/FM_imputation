@@ -41,14 +41,14 @@ data_viz <- function(data, countryinput, OC2input, title){
 
 data <- data  %>%
            unite(subseries, c("OC3", "working_time", "sex"), sep = " | ") %>%
-           mutate(estimate = case_when(flag == "E"  ~ TRUE,
-                                       is.na(flag) | flag == "T" | flag == "R" | flag == "Q" | flag == "I" | flag == "P"  ~ FALSE))
+           mutate(alpha = case_when(flag == "E"  ~ 1,
+                                       is.na(flag) | flag == "T" | flag == "R" | flag == "Q" | flag == "I" | flag == "P"  ~ 0.35))
 
   print(
-    ggplot(data, aes(x = year, y = value, fill = subseries, alpha = estimate)) +
+    ggplot(data, aes(x = year, y = value, fill = subseries, alpha = alpha)) +
       geom_bar(stat="identity", colour="white") +
       labs(title = title, subtitle = paste(countryinput, "|", OC2_input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
-      scale_alpha_discrete(range = c(0.35, 1)) +
+      scale_alpha_identity() +
       guides(alpha = "none") +
       scale_y_continuous(labels = addUnits) + 
       scale_x_continuous(breaks = integer_breaks()) +
@@ -1179,14 +1179,14 @@ estimator_viz <- function(estimator, dataset, countryinput, OC2input){
                  value = case_when(
                    is.na(data) ~ get(estimator),
                    !is.na(data) ~ data),
-                 estimate = case_when(
-                   is.na(data) ~ TRUE,
-                   !is.na(data) ~ FALSE))
-             , aes(x = year, y = value, fill = subseries, alpha = estimate)) +
+                 alpha = case_when(
+                   is.na(data) ~ 1,
+                   !is.na(data) ~ 0.35))
+             , aes(x = year, y = value, fill = subseries, alpha = alpha)) +
         geom_bar(aes(y = value, fill = subseries), stat="identity", colour="white") + 
         labs(title = paste("Visualization of official data and", estimator, "estimator"), subtitle = paste(countryinput, "|", OC2input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
-        scale_alpha_discrete(range = c(0.4, 1)) +
-        guides(alpha = FALSE) +
+        scale_alpha_identity() +
+        guides(alpha = "none") +
         scale_y_continuous(labels = addUnits) + 
         scale_x_continuous(breaks = integer_breaks()) +
         theme(aspect.ratio = 3/4)
