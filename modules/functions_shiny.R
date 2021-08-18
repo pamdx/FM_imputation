@@ -50,9 +50,9 @@ data <- data  %>%
       labs(title = title, subtitle = paste(countryinput, "|", OC2_input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
       scale_alpha_identity() +
       guides(alpha = "none") +
+      theme(aspect.ratio = 3/4) +
       scale_y_continuous(labels = addUnits) + 
-      scale_x_continuous(breaks = integer_breaks()) +
-      theme(aspect.ratio = 3/4)
+      scale_x_continuous(breaks = integer_breaks(), minor_breaks = seq(start_year, end_year, 1))
   )
   
 }
@@ -852,7 +852,6 @@ trend_fit_viz <- function(trenddata, startyear, endyear, countryinput, OC2input)
       coord_cartesian(ylim=c(min(trenddata$value), max(trenddata$value))) +
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from polynomial trend", caption = paste("Adjusted R-squared: ", trenddata$r2adj[1])) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
-      
       theme(aspect.ratio = 3/4)
   ) 
   
@@ -1188,7 +1187,7 @@ estimator_viz <- function(estimator, dataset, countryinput, OC2input){
         scale_alpha_identity() +
         guides(alpha = "none") +
         scale_y_continuous(labels = addUnits) + 
-        scale_x_continuous(breaks = integer_breaks()) +
+        scale_x_continuous(breaks = integer_breaks(), minor_breaks = seq(start_year, end_year, 1)) +
         theme(aspect.ratio = 3/4)
     )
   }
