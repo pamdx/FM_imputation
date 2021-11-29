@@ -7,7 +7,9 @@ library(dplyr)
 
 # Import country names mapping
 
-country_names <- read_tsv("./inputs/country_names.txt")
+country_names <- read_csv("https://raw.githubusercontent.com/openfigis/RefData/gh-pages/country/CL_FI_COUNTRY_ITEM.csv") %>%
+  select(Name_En, ISO3_Code) %>%
+  rename(Country_en = Name_En, iso3 = ISO3_Code)
 
 # Import employment data
 
@@ -27,33 +29,33 @@ saveRDS(FM_raw, "./inputs/FM_DB.RDS")
 
 # Get FAO production data
 
-# temp <- tempfile()
-# download.file("http://www.fao.org/fishery/static/Data/GlobalProduction_2020.1.0.zip", temp)
-# data <- read_csv(unz(temp, "TS_FI_PRODUCTION.csv"), col_types = list(col_integer(), col_integer(), col_integer(), col_character(), col_integer(), col_character(), col_double(), col_character()))
-# countries <- read_csv(unz(temp, "CL_FI_COUNTRY_GROUPS.csv"), col_types = list(col_integer(), col_integer(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character()))
-# areas <- read_csv(unz(temp, "CL_FI_WATERAREA_GROUPS.csv"), col_types = list(col_integer(), col_character(), col_character(), col_character(), col_character(), col_character(), col_character()))
-# 
-# prod_raw <- data %>%
-#   left_join(countries %>% select(UN_Code, Name_En), by = c("COUNTRY" = "UN_Code"), keep = FALSE) %>%
-#   left_join(areas %>% select(Code, InlandMarine_Group), by = c("AREA" = "Code"), keep = FALSE) %>%
-#   filter(UNIT == "t", ) %>%
-#   mutate(oc1 = case_when(
-#     SOURCE == 1 | 2 | 3 | 5 ~ "Aquaculture",
-#     SOURCE == 4 ~ "Fishing"
-#   )) %>%
-#   mutate(oc2 = case_when(
-#     oc1 == "Aquaculture" ~ "Aquaculture",
-#     (oc1 == "Fishing" & InlandMarine_Group == "Marine") ~ "Marine fishing",
-#     (oc1 == "Fishing" & InlandMarine_Group == "Inland") ~ "Inland fishing"
-#   )) %>%
-#   group_by(Name_En, oc1, oc2, YEAR) %>%
-#   summarise(value = sum(QUANTITY)) %>%
-#   ungroup() %>%
-#   rename(country = Name_En, year = YEAR, prod_value = value)
-# 
-# unlink(temp)
-# 
-# saveRDS(prod_raw, "./inputs/PROD.RDS")
+temp <- tempfile()
+download.file("http://www.fao.org/fishery/static/Data/GlobalProduction_2021.1.2.zip", temp)
+data <- read_csv(unz(temp, "GLOBAL_PRODUCTION_QUANTITY.csv"))
+countries <- read_csv(unz(temp, "CL_FI_COUNTRY_GROUPS.csv"))
+areas <- read_csv(unz(temp, "CL_FI_WATERAREA_GROUPS.csv"))
+
+prod_raw <- data %>%
+  left_join(countries %>% select(UN_Code, Name_En), by = c("COUNTRY.UN_CODE" = "UN_Code"), keep = FALSE) %>%
+  left_join(areas %>% select(Code, InlandMarine_Group_En), by = c("AREA.CODE" = "Code"), keep = FALSE) %>%
+  filter(MEASURE == "Q_tlw", ) %>%
+  mutate(oc1 = case_when(
+    PRODUCTION_SOURCE_DET.CODE %in% c("FRESHWATER", "MARINE", "BRACKISHWATER") ~ "Aquaculture",
+    PRODUCTION_SOURCE_DET.CODE == "CAPTURE" ~ "Fishing"
+  )) %>%
+  mutate(oc2 = case_when(
+    oc1 == "Aquaculture" ~ "Aquaculture",
+    (oc1 == "Fishing" & InlandMarine_Group_En == "Marine waters") ~ "Marine fishing",
+    (oc1 == "Fishing" & InlandMarine_Group_En == "Inland waters") ~ "Inland fishing"
+  )) %>%
+  group_by(Name_En, oc1, oc2, PERIOD) %>%
+  summarise(value = sum(VALUE)) %>%
+  ungroup() %>%
+  rename(country = Name_En, year = PERIOD, prod_value = value)
+
+unlink(temp)
+
+saveRDS(prod_raw, "./inputs/PROD.RDS")
 
 # Get ILO labor force data
 
@@ -66,6 +68,11 @@ ILO_labor_raw <- get_ilostat("EAP_2EAP_SEX_AGE_NB_A") %>%
   filter(sex != "SEX_T") %>% 
   mutate(labor_value = obs_value * 1000)
 
+if (nrow(ILO_labor_raw[is.na(ILO_labor_raw$Country_en),]) > 0) {
+  print(ILO_labor_raw[is.na(ILO_labor_raw$Country_en),])
+  stop("missing country mapping")
+}
+
 saveRDS(ILO_labor_raw, "./inputs/ILO_labor.RDS")
 
 # Get OECD fleet data
@@ -75,5 +82,10 @@ OECD_fleet_raw <- OECD::get_dataset(dataset = "FISH_FLEET") %>%
   rename(iso3 = COUNTRY, year = obsTime, fleet_value = obsValue) %>%
   left_join(country_names, by = "iso3") %>%
   select(Country_en, year, fleet_value)
+
+if (nrow(OECD_fleet_raw[is.na(OECD_fleet_raw$Country_en),]) > 0) {
+  print(OECD_fleet_raw[is.na(OECD_fleet_raw$Country_en),])
+  stop("missing country mapping")
+}
 
 saveRDS(OECD_fleet_raw, "./inputs/OECD_fleet.RDS")
