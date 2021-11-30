@@ -39,16 +39,16 @@ prod_raw <- data %>%
   left_join(countries %>% select(UN_Code, Name_En), by = c("COUNTRY.UN_CODE" = "UN_Code"), keep = FALSE) %>%
   left_join(areas %>% select(Code, InlandMarine_Group_En), by = c("AREA.CODE" = "Code"), keep = FALSE) %>%
   filter(MEASURE == "Q_tlw", ) %>%
-  mutate(oc1 = case_when(
+  mutate(OC1 = case_when(
     PRODUCTION_SOURCE_DET.CODE %in% c("FRESHWATER", "MARINE", "BRACKISHWATER") ~ "Aquaculture",
     PRODUCTION_SOURCE_DET.CODE == "CAPTURE" ~ "Fishing"
   )) %>%
-  mutate(oc2 = case_when(
-    oc1 == "Aquaculture" ~ "Aquaculture",
-    (oc1 == "Fishing" & InlandMarine_Group_En == "Marine waters") ~ "Marine fishing",
-    (oc1 == "Fishing" & InlandMarine_Group_En == "Inland waters") ~ "Inland fishing"
+  mutate(OC2 = case_when(
+    OC1 == "Aquaculture" ~ "Aquaculture",
+    (OC1 == "Fishing" & InlandMarine_Group_En == "Marine waters") ~ "Marine fishing",
+    (OC1 == "Fishing" & InlandMarine_Group_En == "Inland waters") ~ "Inland fishing"
   )) %>%
-  group_by(Name_En, oc1, oc2, PERIOD) %>%
+  group_by(Name_En, OC1, OC2, PERIOD) %>%
   summarise(value = sum(VALUE)) %>%
   ungroup() %>%
   rename(country = Name_En, year = PERIOD, prod_value = value)
