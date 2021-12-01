@@ -5,8 +5,8 @@
 ### Prerequisites
 
 To run the tool, you need the following installed on your computer.
-- A recent R installation (version 4.1.0 was used to build the tool)
-- A recent RStudio installation (version 1.4.1103 was used to build the tool)
+- A recent [R](https://cran.r-project.org/) installation (version 4.1.0 was used to build the tool)
+- A recent [RStudio](https://www.rstudio.com/products/rstudio/#rstudio-desktop) installation (version 1.4.1103 was used to build the tool)
 - The following R packages installed: dplyr, ggplot2, readr, tidyr, tibble, compareDF, stargazer, gridExtra, Rilostat, OECD. 
 
 You can install them by running the following code in R:  
@@ -26,10 +26,8 @@ install.packages(
 
 ### Loading basic packages, functions and data
 
-First, in the main.R script, rule the code block below. It will load the packages, functions and data necessary for the tool to run properly.
+First, in the main.R script, run the code block below by selecting it and pressing CTRL+ENTER. It will load the packages, functions and data necessary for the tool to run properly.
 ``` R
-### EMPutator beta ###
-
 rm(list=ls()) # clear R environment
 
 ### Load packages
@@ -56,7 +54,7 @@ source("./modules/data_import.R")
 
 ### Setting filtering parameters and generating a chart of existing data
 
-The next step is to tell the tool which country, sector and period needs to be imputed. Specify those in the code block below, and then run it to generate a visualization of the existing official and estimated data. A "rainbow" bar chart will be displayed in the Plots panel of RStudio.
+The next step is to tell the tool which country, sector and period needs to be imputed. Specify those in the code block below, and then run it to generate a visualization of the existing official and estimated data.
 
 ``` R
 # Main filtering
@@ -70,6 +68,8 @@ end_year <- 2020
 
 source("./modules/subseries_analysis.R")
 ```
+A "rainbow" bar chart like the one below will be displayed in the Plots panel of RStudio.
+![current_estimates](https://user-images.githubusercontent.com/59026485/144248477-c1f24364-1aed-4107-8440-fd7aed5af92f.png)
 
 ### Setting imputation parameters
 
@@ -107,19 +107,38 @@ There are two ways to perform the imputation of missing values:
 
 #### Aggregated imputation
 
-To run aggregated imputation, execute the code below. You can choose between two types of aggregated imputations by setting the "agg_imputation_type" variable: 
-- choose an imputation method for each series of consecutive years with missing data ("Consecutive", most convenient and suitable for most cases)
-- choose an imputation method for each year with missing data ("Year-by-year")
+To run aggregated imputation, first execute the code below. This will create visualizations of the results of each of the imputation method available for the time series at hand:
+- charts of the covariates available for the linear regression:
+![covariates](https://user-images.githubusercontent.com/59026485/144248802-f7338142-665c-4b68-a002-d0303fab7656.png)
+- a chart of the best-fitting linear model:
+![linear_fit](https://user-images.githubusercontent.com/59026485/144248859-b7a95541-f2f4-423e-b35b-d33b5e8368a4.png)
+- a chart of the best-fitting polynomial trend:
+![polynomial_fit](https://user-images.githubusercontent.com/59026485/144248912-6d749b7f-e622-4574-b98e-74f9a7ee10d1.png)
+- a "rainbow" chart for each available imputation method (below is an example for the linear interpolation results):
+![linearint_results](https://user-images.githubusercontent.com/59026485/144249076-dd193235-52b6-41be-814e-faefa73a6165.png)
 
 ``` R
 # Aggregated imputation
 
 source("./modules/processing_aggregated.R")
+```
 
+Then, to launch the imputation prompt, run the code below. 
+
+```
 agg_imputation_type <- 1 # 1 = "Consecutive", 2 = "Year-by-year"
 
 source("./modules/imputation_aggregated.R")
 ```
+
+Note that you can choose between two types of aggregated imputations by setting the "agg_imputation_type" variable: 
+- choose an imputation method for each series of consecutive years with missing data ("Consecutive", most convenient and suitable for most cases)
+
+![agg_imp_cons](https://user-images.githubusercontent.com/59026485/144249777-dce5ca5d-6e61-42ba-8fa5-c2cbb099de37.png)
+
+- choose an imputation method for each year with missing data ("Year-by-year", rarely used)
+
+![agg_imp_yby](https://user-images.githubusercontent.com/59026485/144249952-bbbe337a-9975-4e96-908d-667091fb5c59.png)
 
 #### Subseries imputation
 
@@ -130,6 +149,19 @@ To run subseries imputation, execute the code below. Note that if you run the su
 
 source("./modules/imputation_subseries.R")
 ```
+A first prompt will ask you to select the subseries you want to impute. Select one subseries and click OK.
+
+![subs_imp_1](https://user-images.githubusercontent.com/59026485/144250351-1cc9d44f-a8e1-4862-8013-6339e718ce4b.png)
+
+A second prompt will ask you what imputation method should be applied to the subseries selected. Select one method and click OK.
+
+![subs_imp_2](https://user-images.githubusercontent.com/59026485/144250534-425474c9-4aa1-40b5-a7af-28e018e5b235.png)
+
+Finally, a third prompt will ask you what year should be imputed. You can select multiple year by pressing CTRL or SHIFT. Click OK to confirm your selection.
+
+![subs_imp_3](https://user-images.githubusercontent.com/59026485/144250614-a2290124-bc06-4e24-af2b-64b207190b15.png)
+
+A "rainbow" chart of the current state of subseries imputation will be displayed in RStudio. The first prompt will reappear in case you want to continue the process with other subseries. If you are done with the imputation, select "Stop imputation" and click OK.
 
 ### Exporting the imputed data and imputation report
 
