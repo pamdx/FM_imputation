@@ -45,7 +45,7 @@ prod_raw <- data %>%
   )) %>%
   mutate(OC2 = case_when(
     OC1 == "Aquaculture" ~ "Aquaculture",
-    (OC1 == "Fishing" & InlandMarine_Group_En == "Marine waters") ~ "Marine fishing",
+    (OC1 == "Fishing" & InlandMarine_Group_En == "Marine areas") ~ "Marine fishing",
     (OC1 == "Fishing" & InlandMarine_Group_En == "Inland waters") ~ "Inland fishing"
   )) %>%
   group_by(Name_En, OC1, OC2, PERIOD) %>%
@@ -54,6 +54,8 @@ prod_raw <- data %>%
   rename(country = Name_En, year = PERIOD, prod_value = value)
 
 unlink(temp)
+
+prod_raw$year <- as.integer(prod_raw$year)
 
 saveRDS(prod_raw, "./inputs/PROD.RDS")
 
