@@ -197,7 +197,7 @@ where
 
 In manual regression mode, the user specifies the linear model to be fitted to the data. A tilde (~) should be used to separate the dependent variable from the independent variable(s), and multiple independent variables should be separated by a plus (+) sign. The independent variable should always be "emp_value", while the independent variable(s) can be chosen among "trend", "prod_value", "labor_value" and "fleet_value".
 
-This method is not available in subseries imputation mode. This is to avoir fitting a linear model with only a subset of employment as a dependent variable, whereas the dependent variables represent the entirety of the production, fleet or labour force.
+Please note that the linear regression method is not available in subseries imputation mode. This is to avoir fitting a linear model with only a subset of employment as a dependent variable, whereas the dependent variables represent the entirety of the production, fleet or labour force.
 
 ### Polynomial trends
 
@@ -233,7 +233,7 @@ As their name suggests, backward dragged estimates impute missing employment dat
 
 ### Forward dragging
 
-As their name suggests, forkward dragged estimates impute missing employment data with the closest official value from an anterior year. This method is most commonly applied to the years at the end of the time series.
+As their name suggests, forward dragged estimates impute missing employment data with the closest official value from an anterior year. This method is most commonly applied to the years at the end of the time series.
 
 ## Contents of the extracted folder
 
@@ -250,13 +250,13 @@ The inputs folder contains the data necessary for the imputation tool:
 
 | File           | Type        | Description                                                                                                             |
 |----------------|-------------|-------------------------------------------------------------------------------------------------------------------------|
-| FM_DB.rds      | R data file | Contains the shared FAO-OECD employment database on which to perform the imputation. Converted from a CSV file          |
+| FM_DB.rds      | R data file | Contains the shared FAO-OECD employment database on which to perform the imputation. Converted from a CSV file.         |
 | ILO_labor.rds  | R data file | Contains the ILO labor force database to be used in linear models. Retrieved from the ILO's servers with the Rilostat package.   |
 | OECD_fleet.rds | R data file | Contains the OECD fleet database to be used in linear models. Retrieved from the OECD's servers with the OECD package.           |
 | PROD.rds       | R data file | Contains the FAO capture and aquaculture production database to be used in linear models and productivity computations. Retrieved from FAO's servers with a custom function.|
 
 ### Modules folder
-The modules folder contains the R scripts that are necessary for the imputation tool to do its computations and produce the desired outputs.
+The modules folder contains the R scripts that are necessary for the imputation tool to perform its computations and produce the desired outputs.
 
 | File                    | Type            | Description                                                                                                                                                                            |
 |-------------------------|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -266,7 +266,7 @@ The modules folder contains the R scripts that are necessary for the imputation 
 | imputation_aggregated.R | R script        | Runs the imputation in aggregated mode.                                                                                                                                                |
 | imputation_subseries.R  | R script        | Runs the imputation by subseries.                                                                                                                                                      |
 | inputs_update.R         | R script        | Updates the data located in the inputs folder: online databases from FAO, the OECD and ILO are queried to retrieve the latest production, fleet and labour force data.                 |
-| processing_aggregated.R | R script        | Generates all the outputs necessary to run the imputation in aggregated mode: tables with imputed data and their associated "rainbow" bar charts.                                      |
+| processing_aggregated.R | R script        | Generates all the objects necessary to run the imputation in aggregated mode: tables with imputed data and their associated "rainbow" bar charts.                                      |
 | report.Rmd              | R Markdown file | Generates the HTML imputation report.                                                                                                                                                  |
 | subseries_analysis.R    | R script        | Performs a series of basic computation from the data: visualizes the existing estimates, identifies years with missing data, computes the weight of each subseries for each year, etc. |
 
