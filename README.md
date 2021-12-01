@@ -1,4 +1,4 @@
-# FAO-OECD Employment Data Imputation Tool (FO-EDIT)
+# FAO-OECD Employment Data Imputation Tool
 
 ## Getting started
 
@@ -248,10 +248,10 @@ The inputs folder contains the data necessary for the imputation tool:
 
 | File           | Type        | Description                                                                                                             |
 |----------------|-------------|-------------------------------------------------------------------------------------------------------------------------|
-| FM_DB.rds      | R data file | Contains the shared FAO-OECD employment database on which to perform the imputation.                                    |
-| ILO_labor.rds  | R data file | Contains the ILO labor force database to be used in linear models.                                                      |
-| OECD_fleet.rds | R data file | Contains the OECD fleet database to be used in linear models.                                                           |
-| PROD.rds       | R data file | Contains the FAO capture and aquaculture production database to be used in linear models and productivity computations. |
+| FM_DB.rds      | R data file | Contains the shared FAO-OECD employment database on which to perform the imputation. Converted from a CSV file          |
+| ILO_labor.rds  | R data file | Contains the ILO labor force database to be used in linear models. Retrieved from the ILO's servers with the Rilostat package.   |
+| OECD_fleet.rds | R data file | Contains the OECD fleet database to be used in linear models. Retrieved from the OECD's servers with the OECD package.           |
+| PROD.rds       | R data file | Contains the FAO capture and aquaculture production database to be used in linear models and productivity computations. Retrieved from FAO's servers with a custom function.|
 
 ### Modules folder
 The modules folder contains the R scripts that are necessary for the imputation tool to do its computations and produce the desired outputs.
