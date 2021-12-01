@@ -107,7 +107,15 @@ There are two ways to perform the imputation of missing values:
 
 #### Aggregated imputation
 
-To run aggregated imputation, first execute the code below. This will create visualizations of the results of each of the imputation method available for the time series at hand:
+To run the aggregated imputation, first execute the code below. 
+
+``` R
+# Aggregated imputation
+
+source("./modules/processing_aggregated.R")
+```
+
+This will create visualizations of the results of each of the imputation method available for the time series at hand:
 - charts of the covariates available for the linear regression:
 ![covariates](https://user-images.githubusercontent.com/59026485/144248802-f7338142-665c-4b68-a002-d0303fab7656.png)
 - a chart of the best-fitting linear model:
@@ -116,12 +124,6 @@ To run aggregated imputation, first execute the code below. This will create vis
 ![polynomial_fit](https://user-images.githubusercontent.com/59026485/144248912-6d749b7f-e622-4574-b98e-74f9a7ee10d1.png)
 - a "rainbow" chart for each available imputation method (below is an example for the linear interpolation results):
 ![linearint_results](https://user-images.githubusercontent.com/59026485/144249076-dd193235-52b6-41be-814e-faefa73a6165.png)
-
-``` R
-# Aggregated imputation
-
-source("./modules/processing_aggregated.R")
-```
 
 Then, to launch the imputation prompt, run the code below. 
 
@@ -142,7 +144,7 @@ Note that you can choose between two types of aggregated imputations by setting 
 
 #### Subseries imputation
 
-To run subseries imputation, execute the code below. Note that if you run the subseries imputation after the aggregated imputation, the results of the aggregated imputation will be replaced by those of the subseries imputation.
+To run the subseries imputation, execute the code below. Note that if you run the subseries imputation after the aggregated imputation, the results of the aggregated imputation will be replaced by those of the subseries imputation.
 
 ``` R
 # Subseries imputation
