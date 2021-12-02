@@ -219,11 +219,11 @@ where
 
 ## Historical average
 
-Historical average estimates of employment are the mean of the x previous consecutive years of official data, where x is a positive number defined by the user (by default, 5). Note that these estimates will not be generated if less than x previous consecutive years of official data are available.
+Historical average estimates of employment are the mean of the x previous consecutive years of official data, where x is a positive integer defined by the user (by default, 5). Note that these estimates will not be generated if less than x previous consecutive years of official data are available.
 
 ## Historical growth
 
-Historical growth estimates of employment are an extrapolation based on the [compound annual growth rate](https://en.wikipedia.org/wiki/Compound_annual_growth_rate) (CAGR) of the x previous consecutive years of official data, where x is a positive number defined by the user (by default, 5). Note that these estimates will not be generated if less than x previous consecutive years of official data are available.
+Historical growth estimates of employment are an extrapolation based on the [compound annual growth rate](https://en.wikipedia.org/wiki/Compound_annual_growth_rate) (CAGR) of the x previous consecutive years of official data, where x is a positive integer defined by the user (by default, 5). Note that these estimates will not be generated if less than x previous consecutive years of official data are available.
 
 ## Backward dragging
 
