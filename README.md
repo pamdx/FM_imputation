@@ -5,9 +5,7 @@
 To run the tool, you need the following installed on your computer.
 - A recent [R](https://cran.r-project.org/) installation (version 4.1.0 was used to build the tool)
 - A recent [RStudio](https://www.rstudio.com/products/rstudio/#rstudio-desktop) installation (version 1.4.1103 was used to build the tool)
-- The following R packages installed: dplyr, ggplot2, readr, tidyr, tibble, compareDF, stargazer, gridExtra, Rilostat, OECD. 
-
-You can install them by running the following code in R:  
+- The following R packages installed: dplyr, ggplot2, readr, tidyr, tibble, compareDF, stargazer, gridExtra, Rilostat, OECD. You can install these packages by running the R code below:  
 ``` R
 install.packages(
   c("dplyr", "ggplot2", "readr", "tidyr", "tibble", "compareDF", "stargazer", "gridExtra", "Rilostat", "OECD")
@@ -52,7 +50,7 @@ source("./modules/data_import.R")
 
 ## Setting filtering parameters and generating a chart of existing data
 
-The next step is to tell the tool which country, sector and period needs to be imputed. Specify those in the code block below, and then run it to generate a visualization of the existing official and estimated data.
+The next step is to tell the tool which country, sector and period needs to be imputed. Specify those in the code block below, and then run it to generate a visualization of the existing official and estimated data. The country input must be one of the values listed in the "Name_En" column from this ![FAO country reference](https://github.com/openfigis/RefData/blob/gh-pages/country/CL_FI_COUNTRY_ITEM.csv). The sector input must be one of the following values: "Aquaculture", "Inland fishing", "Marine fishing", "Subsistence", "Unspecified", or "Processing".
 
 ``` R
 # Main filtering
