@@ -246,10 +246,24 @@ The inputs folder contains the data necessary for the imputation tool:
 
 | File           | Type        | Description                                                                                                             |
 |----------------|-------------|-------------------------------------------------------------------------------------------------------------------------|
-| FM_DB.rds      | R data file | Contains the shared FAO-OECD employment database on which to perform the imputation. Converted from a CSV file.         |
+| FM_DB.rds      | R data file | Contains the up-to-date FAO-OECD employment database on which to perform the imputation. Converted from a CSV file with the inputs_update.R module.         |
 | ILO_labor.rds  | R data file | Contains the ILO labor force database to be used in linear models. Retrieved from the ILO's servers with the Rilostat package.   |
 | OECD_fleet.rds | R data file | Contains the OECD fleet database to be used in linear models. Retrieved from the OECD's servers with the OECD package.           |
 | PROD.rds       | R data file | Contains the FAO capture and aquaculture production database to be used in linear models and productivity computations. Retrieved from FAO's servers with a custom function.|
+
+The FM_DB.rds file should have the following structure:
+
+| Column          | Type      | Accepted values                                                                                                                                                                                                                                                                              |
+|-----------------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| geographic_area | character | Values listed in the "Name_En" column from this ![FAO country reference](https://github.com/openfigis/RefData/blob/gh-pages/country/CL_FI_COUNTRY_ITEM.csv)                                                                                                                                                                                                                        |
+| OC2             | character | "Aquaculture", "Inland fishing", "Marine fishing", "Subsistence", "Unspecified", "Processing"                                                                                                                                                                                                |
+| OC3             | character | "Aquaculture", "Inland Waters Fishing", "Marine Coastal Fishing", "Marine Deep-Sea Fishing", "Marine Fishing, nei", "Subsistence", "Unspecified", "Processing"                                                                                                                               |
+| working_time    | character | "Full time", "Part time", "Occasional", "Status Unspecified"                                                                                                                                                                                                                                 |
+| sex             | character | "M", "F", "U"                                                                                                                                                                                                                                                                                |
+| year            | integer   | Any year between 1950 and the current year                                                                                                                                                                                                                                                   |
+| value           | integer   | Any positive integer, or blank if accompanied by an "M" or "Q" flag                                                                                                                                                                                                                          |
+| flag            | character | (Blank) = Official figure, "B" = Break in time series, "E" = FAO estimate, "I" = Estimate from the reporting country, "M" = Missing value (data cannot exist, not applicable), "P" = Provisional data, "Q" = Confidential data, "T" = Data reported by non-official or semi-official sources |
+| comment         | character | Blank or any text providing background on the entry                                                                                                                                                                                                                                          |
 
 ## Modules folder
 The modules folder contains the R scripts that are necessary for the imputation tool to perform its computations and produce the desired outputs.
