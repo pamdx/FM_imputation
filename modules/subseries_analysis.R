@@ -24,6 +24,12 @@ missing_years_series <- missingyearsseries(missingyears = missing_years)
 missing_years_incl_mixed <- missingyearsinclmixed(yearsall = years_all, yearsdataexclmixed = years_data_excl_mixed)
 missing_years_series_incl_mixed <- missingyearsseriesinclmixed(missingyearsinclmixed = missing_years_incl_mixed)
 
+if (length(missing_years) == 0) {
+  
+  print("There is no year with missing data for the selected period. No imputation is needed.")
+
+  }
+
 # Identify years where the continuity of subseries is interrupted
 
 subseries_break <- subseriesbreak(yearsdata = years_data, startyear = start_year, FMfiltered = FM_filtered)

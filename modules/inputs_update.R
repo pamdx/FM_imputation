@@ -1,9 +1,9 @@
 ##### UPDATE DATA INPUTS #####
 
+library(dplyr)
 library(readr)
 library(Rilostat)
 library(OECD)
-library(dplyr)
 
 # Import country names mapping
 
