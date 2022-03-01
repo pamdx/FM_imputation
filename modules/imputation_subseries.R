@@ -1,6 +1,6 @@
 # Initialize imputed data table
 
-imputed_data <- imputed_data_init(FMfiltered = FM_filtered)
+imputed_data <- imputed_data_init(data = FM_exisiting_estimates)
 
 # Subseries-level imputation
 

@@ -1214,9 +1214,9 @@ estimator_viz <- function(estimator, dataset, countryinput, OC2input){
 
 # Initialize imputed data table
 
-imputed_data_init <- function(FMfiltered){
+imputed_data_init <- function(data){
   
-  imputed_data <- FMfiltered %>%
+  imputed_data <- data %>%
     select(subseries, year, value, flag, comment) %>%
     mutate(timestamp = as.character(NA))
   
@@ -1348,53 +1348,64 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
        
     }
     
-    selected_estimator <- select.list(c("Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged"), preselect = NULL, multiple = FALSE, graphics = TRUE, title = "Which estimator would you like to apply?")
+    selected_estimator <- select.list(c("Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged", "(Remove estimated data)"), preselect = NULL, multiple = FALSE, graphics = TRUE, title = "Which estimator would you like to apply?")
     
     selected_year <- select.list(as.character(setdiff(years_all, FM_filtered$year[FM_filtered$subseries == selected_subseries])), preselect = NULL, multiple = TRUE, graphics = TRUE, title = "On which missing years should the estimation be performed?")
     
+    #replace_existing <- "E" %in% filter(imputeddata, year %in% selected_year, subseries == selected_subseries)$flag # Check if the selected year/subseries combination includes existing estimates to be replaced
+    
     switch(selected_estimator,
            
-           "Polynomial trend" = imputeddata <- imputeddata %>% 
+           "Polynomial trend" = imputeddata <- imputeddata %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
              bind_rows(trend_estimator(trenddata = trend_fit(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all, startyear = start_year)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(comment = paste0(comment, ", subseries-level imputation")) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           "Linear interpolation" = imputeddata <- imputeddata %>% 
+           "Linear interpolation" = imputeddata <- imputeddata %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
              bind_rows(filter(linearint_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(comment = paste0(comment, ", subseries-level imputation")) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           "Historical average" = imputeddata <- imputeddata %>% 
+           "Historical average" = imputeddata <- imputeddata %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
              bind_rows(filter(histavg_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all, threshold = histavg_threshold), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(comment = paste0(comment, ", subseries-level imputation")) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           "Historical growth" = imputeddata <- imputeddata %>% 
+           "Historical growth" = imputeddata <- imputeddata %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
              bind_rows(filter(histgrowth_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all, threshold = histgrowth_threshold), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(comment = paste0(comment, ", subseries-level imputation")) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           "Backward dragged" = imputeddata <- imputeddata %>% 
+           "Backward dragged" = imputeddata <- imputeddata %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
              bind_rows(filter(bdragged_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(comment = paste0(comment, ", subseries-level imputation")) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           "Forward dragged" = imputeddata <- imputeddata %>% 
+           "Forward dragged" = imputeddata <- imputeddata %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
              bind_rows(filter(fdragged_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
                          mutate(comment = paste0(comment, ", subseries-level imputation")) %>%
-                         mutate(timestamp = paste(Sys.time())))
+                         mutate(timestamp = paste(Sys.time()))),
+           
+           "(Remove estimated data)" = imputeddata <- imputeddata %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E"))
     )
     
     data_viz(data = imputeddata %>%
