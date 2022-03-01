@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-To run the tool, you need the following installed on your computer.
+To run the tool, you need the following installed on your computer:
 - A recent [R](https://cran.r-project.org/) installation (version 4.1.0 was used to build the tool)
 - A recent [RStudio](https://www.rstudio.com/products/rstudio/#rstudio-desktop) installation (version 1.4.1103 was used to build the tool)
 - The following R packages installed: dplyr, ggplot2, readr, tidyr, tibble, compareDF, stargazer, gridExtra, Rilostat, OECD. You can install these packages by running the R code below:  
@@ -14,9 +14,16 @@ install.packages(
 
 ## Installation
 
+On FAO computers:
 1. Extract the contents of the compressed folder to the destination of your choice (e.g. on your Desktop).
 2. Double-click the "emputator.Rproj" file in the main folder.
 3. The tool will open in RStudio.
+
+On OECD computers:
+1.	Extract the contents of the compressed folder to the destination of your choice (e.g. on your Desktop).
+2.	Open RStudio using the link \\main.oecd.org\EM_Apps\R\RStudio.cmd 
+3.	Open the “emputator.Rproj” file from the main folder.
+4.	The tool will open in RStudio.
 
 # How to use the imputation tool
 
@@ -50,17 +57,17 @@ source("./modules/data_import.R")
 
 ## Setting filtering parameters and generating a chart of existing data
 
-The next step is to tell the tool which country, sector and period needs to be imputed. Specify those in the code block below, and then run it to generate a visualization of the existing official and estimated data. The country input must be one of the values listed in the "Name_En" column from this ![FAO country reference](https://github.com/openfigis/RefData/blob/gh-pages/country/CL_FI_COUNTRY_ITEM.csv). The sector input must be one of the following values: "Aquaculture", "Inland fishing", "Marine fishing", "Subsistence", "Unspecified", or "Processing".
+The next step is to tell the tool which country, sector and period needs to be imputed. By running the code below, two popup windows will successively open for the user, asking first to choose a country and, second, a sector. To change the target period, the user can directly modify the code below.
 
 ``` R
-# Main filtering
+# Main filtering parameters
 
-country_input <- "France"
-OC2_input <- "Marine fishing"
+country_input <- select_country(FM_raw, country_input)
+OC2_input <- select_sector(FM_raw, country_input)
 start_year <- 1995
 end_year <- 2020
 
-# Subseries-related analyses
+# Subseries-related analyses and visualization of existing data
 
 source("./modules/subseries_analysis.R")
 ```
@@ -98,8 +105,10 @@ histgrowth_threshold <- 5 # Number of previous years on which to base historical
 ## Choosing the imputation mode
 
 There are two ways to perform the imputation of missing values: 
-- by generating aggregated imputed values for years with no data, which are then disaggregated based on the weights of subseries for years with official data ("aggregated imputation", most convenient and suitable for most cases) 
+- by generating aggregated imputed values for years with no official data, which are then disaggregated based on the weights of subseries for years with official data ("aggregated imputation", most convenient and suitable for most cases) 
 - by imputing one subseries at a time ("subseries imputation", more suitable in cases where only some subseries need to be estimated for a given year)
+
+In both imputation modes, it is possible to replace existing estimates with new, different estimates.
 
 ### Aggregated imputation
 
@@ -124,17 +133,17 @@ This will create visualizations of the results of each of the imputation method 
 Then, to launch the imputation prompt, run the code below. 
 
 ```
-agg_imputation_type <- 1 # 1 = "Consecutive", 2 = "Year-by-year"
+agg_imputation_type <- 1 # Select 1 to apply estimation to all missing consecutive years, select 2 to apply estimation separately to each year in the period with consecutive missing years.
 
 source("./modules/imputation_aggregated.R")
 ```
 
-Note that you can choose between two types of aggregated imputations by setting the "agg_imputation_type" variable: 
-- choose an imputation method for each series of consecutive years with missing data ("Consecutive", most convenient and suitable for most cases)
+Note that you can choose between two types of aggregated imputations by setting the `agg_imputation_type` variable: 
+1. The user can apply the same estimation method to consecutive years without official data by using `agg_imputation_type <- 1` (most convenient and suitable for most cases). In this case, the imputation prompt will ask which method to apply to all consecutive years, as shown below.
 
 ![agg_imp_cons](https://user-images.githubusercontent.com/59026485/144249777-dce5ca5d-6e61-42ba-8fa5-c2cbb099de37.png)
 
-- choose an imputation method for each year with missing data ("Year-by-year", rarely used)
+2. The user can decide to treat consecutive years without official data differently and apply each time a different estimation method by using `agg_imputation_type <- 2` (more rarely used). In this case the imputation prompt will ask which imputation method to use for each consecutive year, as shown below.
 
 ![agg_imp_yby](https://user-images.githubusercontent.com/59026485/144249952-bbbe337a-9975-4e96-908d-667091fb5c59.png)
 
@@ -188,7 +197,7 @@ In automatic regression mode, the following linear models are fitted to the data
 
 where
 - Specification 2 is used for imputation of fishery employment in OECD countries only (the fleet data is currently only available for OECD countries).
-- Specification 2 is used in all other cases.
+- Specification 1 is used in all other cases.
 - "trend" is the sequence of the years composing the time series being imputed. Including a [trend variable](https://en.wikipedia.org/wiki/Linear_trend_estimation) may increase the linear fit of time series that exhibit a clear upward or downward trend over time.
 
 In manual regression mode, the user specifies the linear model to be fitted to the data. A tilde (~) should be used to separate the dependent variable from the independent variable(s), and multiple independent variables should be separated by a plus (+) sign. The independent variable should always be "emp_value", while the independent variable(s) can be chosen among "trend", "prod_value", "labor_value" and "fleet_value".
@@ -205,15 +214,15 @@ The trend with the highest adjusted R-squared (the one that fits the data most c
 
 [Linear interpolation](https://en.wikipedia.org/wiki/Linear_interpolation) estimates are generated with the following function: 
 
-![linear interpolation function](https://wikimedia.org/api/rest_v1/media/math/render/svg/8cd1838ecabafa019029fe20e05265378d042e16)
+<img src="https://render.githubusercontent.com/render/math?math=\LARGE y=y_{0}%2B(x-x_{0}){\frac {y_{1}-y_{0}}{x_{1}-x_{0}}}={\frac {y_{0}(x_{1}-x)%2By_{1}(x-x_{0})}{x_{1}-x_{0}}}">
 
 where
 - y is the employment value to estimate
 - x is the year associated with the value to estimate
-- x0 is the reference year (i.e. with official data) on the left side of x
-- x1 is the reference year on the right side of x
-- y0 is the official employment value associated with x0
-- y1 is the official employment value associated with x1
+- x<sub>0</sub> is the reference year (i.e. with official data) on the left side of x
+- x<sub>1</sub> is the reference year on the right side of x
+- y<sub>0</sub> is the official employment value associated with x<sub>0</sub>
+- y<sub>1</sub> is the official employment value associated with x<sub>1</sub>
 
 ## Historical average
 
@@ -236,37 +245,41 @@ As their name suggests, forward dragged estimates impute missing employment data
 ## Main folder
 This folder includes the files that run the imputation tool:
 
-| File            | Type           | Description                             |
-|-----------------|----------------|-----------------------------------------|
-| emputator.Rproj | R project file | Opens the tool in RStudio.              |
-| main.R          | R script       | Main script from which the tool is run. |
+| File            | Type           | Description                                                                          |
+|-----------------|----------------|--------------------------------------------------------------------------------------|
+| .gitignore      | gitignore file | Tells Git (a version control system) which files or folders to ignore in a project.  |
+| .RData          | R data file    | Used by R to save a session’s environment (the objects in memory).                   |
+| .RHistory       | R history file | Contains the history of commands entered by the user during an open R session.       |
+| emputator.Rproj | R project file | Opens the tool in RStudio.                                                           |
+| main.R          | R script       | Main script from which the tool is run.                                              |
+| README.md       | Markdown file  | Manual for the companion GitHub site.                                                |
 
-## Inputs folder
-The inputs folder contains the data necessary for the imputation tool:
+## Sub-folder: Inputs
+This folder contains the data necessary for the imputation tool:
 
 | File           | Type        | Description                                                                                                             |
 |----------------|-------------|-------------------------------------------------------------------------------------------------------------------------|
-| FM_DB.rds      | R data file | Contains the up-to-date FAO-OECD employment database on which to perform the imputation. Converted from a CSV file with the inputs_update.R module.         |
-| ILO_labor.rds  | R data file | Contains the ILO labor force database to be used in linear models. Retrieved from the ILO's servers with the Rilostat package.   |
-| OECD_fleet.rds | R data file | Contains the OECD fleet database to be used in linear models. Retrieved from the OECD's servers with the OECD package.           |
-| PROD.rds       | R data file | Contains the FAO capture and aquaculture production database to be used in linear models and productivity computations. Retrieved from FAO's servers with a custom function.|
+| FM_DB.rds      | R data file | Contains the up-to-date FAO-OECD employment database on which to perform the imputation. Can be converted from a CSV file stored in the same subfolder by running the inputs_update.R module, or can be the output of another R project (e.g. consolidation of data reported by countries). |
+| ILO_labor.rds  | R data file | Contains the ILO labor force database to be used in linear models. Retrieved from the ILO's servers with the Rilostat package by running the inputs_update.R module.   |
+| OECD_fleet.rds | R data file | Contains the OECD fleet database to be used in linear models. Retrieved from the OECD's servers with the OECD package by running the inputs_update.R module.           |
+| PROD.rds       | R data file | Contains the FAO capture and aquaculture production database to be used in linear models and productivity computations. Retrieved from FAO's servers with a custom function by running the inputs_update.R module.|
 
 The FM_DB.rds file should have the following structure:
 
-| Column          | Type      | Accepted values                                                                                                                                                                                                                                                                              |
-|-----------------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| geographic_area | character | Values listed in the "Name_En" column from this ![FAO country reference](https://github.com/openfigis/RefData/blob/gh-pages/country/CL_FI_COUNTRY_ITEM.csv)                                                                                                                                                                                                                        |
-| OC2             | character | "Aquaculture", "Inland fishing", "Marine fishing", "Subsistence", "Unspecified", "Processing"                                                                                                                                                                                                |
-| OC3             | character | "Aquaculture", "Inland Waters Fishing", "Marine Coastal Fishing", "Marine Deep-Sea Fishing", "Marine Fishing, nei", "Subsistence", "Unspecified", "Processing"                                                                                                                               |
-| working_time    | character | "Full time", "Part time", "Occasional", "Status Unspecified"                                                                                                                                                                                                                                 |
-| sex             | character | "M", "F", "U"                                                                                                                                                                                                                                                                                |
-| year            | integer   | Any year between 1950 and the current year                                                                                                                                                                                                                                                   |
-| value           | integer   | Any positive integer, or blank if accompanied by an "M" or "Q" flag                                                                                                                                                                                                                          |
-| flag            | character | (Blank) = Official figure, "B" = Break in time series, "E" = FAO estimate, "I" = Estimate from the reporting country, "M" = Missing value (data cannot exist, not applicable), "P" = Provisional data, "Q" = Confidential data, "T" = Data reported by non-official or semi-official sources |
+| Column          | Type      | Accepted values |
+|-----------------|-----------|-----------------|
+| geographic_area | character | Values listed in the "Name_En" column from this ![FAO country reference](https://github.com/openfigis/RefData/blob/gh-pages/country/CL_FI_COUNTRY_ITEM.csv) |
+| OC2             | character | "Aquaculture" <br /> "Inland fishing" <br /> "Marine fishing" <br /> "Subsistence" <br /> "Unspecified" <br /> "Processing" |
+| OC3             | character | "Aquaculture" <br /> "Inland Waters Fishing" <br /> "Marine Coastal Fishing" <br /> "Marine Deep-Sea Fishing" <br /> "Marine Fishing, nei" <br /> "Subsistence" <br /> "Unspecified" <br /> "Processing"  |
+| working_time    | character | "Full time" <br /> "Part time" <br /> "Occasional" <br /> "Status Unspecified"  |
+| sex             | character | "M" <br /> "F" <br /> "U" |
+| year            | integer   | Any year between 1950 and the current year  |
+| value           | integer   | Any positive integer, or blank if accompanied by an "M" or "Q" flag |
+| flag            | character | (Blank) = Official figure <br /> "B" = Break in time series <br /> "E" = FAO estimate <br /> "I" = Estimate from the reporting country <br /> "M" = Missing value (data cannot exist, not applicable) <br /> "P" = Provisional data <br /> "Q" = Confidential data <br /> "T" = Data reported by non-official or semi-official sources |
 | comment         | character | Blank or any text providing background on the entry                                                                                                                                                                                                                                          |
 
-## Modules folder
-The modules folder contains the R scripts that are necessary for the imputation tool to perform its computations and produce the desired outputs.
+## Sub-folder: Modules
+This folder contains the R scripts that are necessary for the imputation tool to perform its computations and produce the desired outputs.
 
 | File                    | Type            | Description                                                                                                                                                                            |
 |-------------------------|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -280,8 +293,8 @@ The modules folder contains the R scripts that are necessary for the imputation 
 | report.Rmd              | R Markdown file | Generates the HTML imputation report.                                                                                                                                                  |
 | subseries_analysis.R    | R script        | Performs a series of basic computation from the data: visualizes the existing estimates, identifies years with missing data, computes the weight of each subseries for each year, etc. |
 
-## Outputs folder
-The outputs folder contains the imputation results by country and sector. For each country/sector processed by the tool, an HTML report and a CSV file of the imputed data are saved in this folder.
+## Sub-folder: Outputs
+This folder contains the imputation results by country and sector. For each country/sector processed by the tool, an HTML report and a CSV file of the imputed data are saved in this folder.
 
 | File            | Type           | Description                             |
 |-----------------|----------------|-----------------------------------------|
