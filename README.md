@@ -42,11 +42,15 @@ The root folder includes the files that run the imputation tool:
 | main.R          | R script            | Main script from which the tool is run.                                              |
 | README.md       | Markdown file       | Manual for the companion GitHub site.                                                |
 
+The [inputs](https://github.com/pamdx/emputator/edit/master/README.md#contents-of-the-inputs-sub-folder
+), [modules](https://github.com/pamdx/emputator/edit/master/README.md#appendix-contents-of-the-modules-sub-folder
+) and [outputs](https://github.com/pamdx/emputator/edit/master/README.md#contents-of-the-outputs-sub-folder) sub-folders and their contents are described throughout the rest of this manual.
+
 # How to use the imputation tool
 
 With the emputator project open in RStudio, open the main.R script by clicking on the file in the "Files" tab of the lower-right panel in RStudio:
 
-![openmainscript](https://user-images.githubusercontent.com/59026485/156348040-4625ff0e-adc3-4ad5-9059-647d1755950a.png)
+![openmainscript](https://user-images.githubusercontent.com/59026485/156359750-69c834ab-7aa1-4122-ac7c-9666e221b282.png)
 
 ## Loading basic packages, functions and data
 
@@ -122,7 +126,7 @@ A "rainbow" bar chart like the one below will be displayed in the "Plots" tab of
 
 ## Overview of the available imputation methods
 
-At this stage, it is important for the user to understand imputation options are offered by the application. Below is a short description of each of the available imputation methods.
+At this stage, it is important for the user to be familiar with the imputation methods offered by the application. Below is a short description of each of the available methods.
 
 ### Linear regression
 
@@ -216,7 +220,7 @@ There are two ways to perform the imputation of missing values:
 - by generating aggregated imputed values for years with no official data, which are then disaggregated based on the weights of subseries for years with official data ("aggregated imputation", most convenient and suitable for most cases) 
 - by imputing one subseries at a time ("subseries imputation", more suitable in cases where only some subseries need to be estimated for a given year)
 
-In both imputation modes, it is possible to replace existing estimates with new, different estimates.
+In both imputation modes, it is possible to replace existing estimates with new, different estimates. Importantly, it is impossible to modify official data with the application.
 
 ### Aggregated imputation
 
@@ -268,9 +272,9 @@ A first prompt will ask you to select the subseries you want to impute. Select o
 
 ![subs_imp_1](https://user-images.githubusercontent.com/59026485/144250351-1cc9d44f-a8e1-4862-8013-6339e718ce4b.png)
 
-A second prompt will ask you what imputation method should be applied to the subseries selected. Select one method and click OK.
+A second prompt will ask you what imputation method should be applied to the subseries selected. Note that you can also choose to remove existing estimates. Select one method and click OK.
 
-![subs_imp_2](https://user-images.githubusercontent.com/59026485/144250534-425474c9-4aa1-40b5-a7af-28e018e5b235.png)
+![subs_imp_2](https://user-images.githubusercontent.com/59026485/156358429-20293a96-a95e-4614-b0cf-e7d1f6ed0f39.png)
 
 Finally, a third prompt will ask you what year should be imputed. You can select multiple year by pressing CTRL or SHIFT. Click OK to confirm your selection.
 
@@ -296,7 +300,7 @@ The folder contains the imputation results by country and sector. For each count
 | [country]_[sector]_report.html | HTML document | Summary of the imputation process and results.              |
 | [country]_[sector]_imputed.csv          | CSV file       | Imputed time series |
 
-# Contents of the Modules sub-folder
+# Appendix: contents of the Modules sub-folder
 This folder contains the R scripts that are necessary for the imputation tool to perform its computations and produce the desired outputs.
 
 | File                    | Type            | Description                                                                                                                                                                            |
