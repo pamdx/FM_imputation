@@ -94,7 +94,7 @@ Please note that the FM_DB.rds file should have the following structure:
 
 | Column          | Type      | Accepted values |
 |-----------------|-----------|-----------------|
-| geographic_area | character | Values listed in the "Name_En" column from this ![FAO country reference](https://github.com/openfigis/RefData/blob/gh-pages/country/CL_FI_COUNTRY_ITEM.csv) |
+| geographic_area | character | Values listed in the "Name_En" column from this [FAO country reference](https://github.com/openfigis/RefData/blob/gh-pages/country/CL_FI_COUNTRY_ITEM.csv) |
 | OC2             | character | "Aquaculture" <br /> "Inland fishing" <br /> "Marine fishing" <br /> "Subsistence" <br /> "Unspecified" <br /> "Processing" |
 | OC3             | character | "Aquaculture" <br /> "Inland Waters Fishing" <br /> "Marine Coastal Fishing" <br /> "Marine Deep-Sea Fishing" <br /> "Marine Fishing, nei" <br /> "Subsistence" <br /> "Unspecified" <br /> "Processing"  |
 | working_time    | character | "Full time" <br /> "Part time" <br /> "Occasional" <br /> "Status Unspecified"  |
