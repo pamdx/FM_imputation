@@ -25,7 +25,7 @@ FMfilter <- function(FMraw, countryinput, OC2input, startyear, endyear){
     filter(OC2 == OC2input) %>%
     filter(between(year, startyear, endyear)) %>%
     filter(!is.na(value) | !is.na(flag)) %>%
-    filter(is.na(flag) | flag == "T" | flag == "R" | flag == "Q" | flag == "M" | flag == "I" | flag == "P") %>% # Make dynamic input in Shiny
+    filter(is.na(flag) | flag == "B"  | flag == "I" | flag == "M" | flag == "P" | flag == "Q" | flag == "T" | flag == "R") %>% # Make dynamic input in Shiny
     unite("subseries", geographic_area, OC2, OC3, working_time, sex, sep = "_", remove = FALSE) %>%
     select(geographic_area:comment, subseries)
   
@@ -60,7 +60,7 @@ data_viz <- function(data, countryinput, OC2input, title){
 data <- data  %>%
            unite(subseries, c("OC3", "working_time", "sex"), sep = " | ") %>%
            mutate(alpha = case_when(flag == "E"  ~ 1,
-                                       is.na(flag) | flag == "T" | flag == "R" | flag == "Q" | flag == "I" | flag == "P"  ~ 0.35))
+                                       is.na(flag) | flag == "B"  | flag == "T" | flag == "R" | flag == "Q" | flag == "I" | flag == "P"  ~ 0.35))
 
   print(
     ggplot(data, aes(x = year, y = value, fill = subseries, alpha = alpha)) +
@@ -1348,7 +1348,7 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
        
     }
     
-    selected_estimator <- select.list(c("Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged", "(Remove estimated data)"), preselect = NULL, multiple = FALSE, graphics = TRUE, title = "Which estimator would you like to apply?")
+    selected_estimator <- select.list(c("Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged", "[Remove estimated data]"), preselect = NULL, multiple = FALSE, graphics = TRUE, title = "Which estimator would you like to apply?")
     
     selected_year <- select.list(as.character(setdiff(years_all, FM_filtered$year[FM_filtered$subseries == selected_subseries])), preselect = NULL, multiple = TRUE, graphics = TRUE, title = "On which missing years should the estimation be performed?")
     
@@ -1404,7 +1404,7 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
                          mutate(comment = paste0(comment, ", subseries-level imputation")) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           "(Remove estimated data)" = imputeddata <- imputeddata %>%
+           "[Remove estimated data]" = imputeddata <- imputeddata %>%
              filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E"))
     )
     
