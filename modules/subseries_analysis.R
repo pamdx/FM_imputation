@@ -8,7 +8,7 @@ subseries <- getsubseries(FMfiltered = FM_filtered)
 
 FM_exisiting_estimates <- FMexisitingestimates(FMraw = FM_raw, countryinput = country_input, OC2input = OC2_input, startyear = start_year, endyear = end_year)
 
-data_viz(data = FM_exisiting_estimates, countryinput = country_input, OC2input = OC2_input, title = "Visualization of current estimates")
+data_viz(data = FM_exisiting_estimates, countryinput = country_input, OC2input = OC2_input, title = "Visualization of existing data and estimates")
 
 # Identify aggregated Country/sector/year data where official and estimated data are mixed
 
