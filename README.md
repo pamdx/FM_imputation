@@ -58,24 +58,16 @@ First, in the main.R script, run the code block below by selecting it and pressi
 ``` R
 rm(list=ls()) # clear R environment
 
-### Load packages
+# Load packages
 
-library(dplyr)
-library(ggplot2)
-library(readr)
-library(tidyr)
-library(tibble)
-library(compareDF)
-library(stargazer)
-library(gridExtra)
-
-theme_set(theme_bw()) # set simple theme for charts
+pkgs <- c("dplyr", "ggplot2", "readr", "tidyr", "tibble", "compareDF", "stargazer", "gridExtra", "rmarkdown")
+lapply(pkgs, require, character.only = TRUE) # One-liner to load all packages
 
 # Load app functions
 
 source("./modules/functions.R")
 
-# Data import
+# Load data from inputs folder
 
 source("./modules/data_import.R")
 ```
@@ -94,7 +86,7 @@ Please note that the FM_DB.rds file should have the following structure:
 
 | Column          | Type      | Accepted values |
 |-----------------|-----------|-----------------|
-| geographic_area | character | Values listed in the "Name_En" column from this [FAO country reference](https://github.com/openfigis/RefData/blob/gh-pages/country/CL_FI_COUNTRY_ITEM.csv) |
+| geographic_area | character | Values listed in the "Name_En" column from this [FAO country reference](https://github.com/openfigis/RefData/blob/gh-pages/country/CL_FI_COUNTRY_M49.csv) |
 | OC2             | character | "Aquaculture" <br /> "Inland fishing" <br /> "Marine fishing" <br /> "Subsistence" <br /> "Unspecified" <br /> "Processing" |
 | OC3             | character | "Aquaculture" <br /> "Inland Waters Fishing" <br /> "Marine Coastal Fishing" <br /> "Marine Deep-Sea Fishing" <br /> "Marine Fishing, nei" <br /> "Subsistence" <br /> "Unspecified" <br /> "Processing"  |
 | working_time    | character | "Full time" <br /> "Part time" <br /> "Occasional" <br /> "Status Unspecified"  |
