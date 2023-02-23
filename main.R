@@ -2,18 +2,10 @@
 
 rm(list=ls()) # clear R environment
 
-### Load packages
+# Load packages
 
-library(dplyr)
-library(ggplot2)
-library(readr)
-library(tidyr)
-library(tibble)
-library(compareDF)
-library(stargazer)
-library(gridExtra)
-
-theme_set(theme_bw()) # set simple theme for charts
+pkgs <- c("dplyr", "ggplot2", "readr", "tidyr", "tibble", "compareDF", "stargazer", "gridExtra", "rmarkdown")
+lapply(pkgs, require, character.only = TRUE) # One-liner to load all packages
 
 # Load app functions
 
@@ -38,16 +30,16 @@ source("./modules/subseries_analysis.R")
 
   # Linear regression
 
-share_valid_reg <- 0 # Proportion of years with official data necessary to run regression (to avoid generating estimates from too little information)
+share_valid_reg <- 0.3 # Proportion of years with official data necessary to run regression (to avoid generating estimates from too little information)
 obs_threshold_linreg <- round(length(years_all) * share_valid_reg) # Do not modify
 reg_type <- 1 # Regression type 1 = automatic (runs predetermined models and selects the one with best fit), 2 = manual (see below)
 trend <- seq(start_year:end_year) # Do not modify
-reg_dynamic <- emp_value ~ prod_value + labor_value # Specify manual regression by choosing independent variables from: trend, prod_value, labor_value, fleet_value (separated by "+")
+reg_dynamic <- emp_value ~ prod_value + trend # Specify manual regression by choosing independent variables from: trend, prod_value, labor_value, fleet_value (separated by "+")
 fit_threshold_reg <- 0 # R2-squared threshold for the regression to be taken in consideration
 
   # Polynomial trends
 
-share_valid_trend <- 0 # Proportion of years with official data necessary to run regression (to avoid generating estimates from too little information)
+share_valid_trend <- 0.3 # Proportion of years with official data necessary to run regression (to avoid generating estimates from too little information)
 obs_threshold_trend <- round(length(years_all) * share_valid_trend) # Do not modify
 fit_threshold_trend <- 0 # R2-squared threshold for the regression to be taken in consideration
 

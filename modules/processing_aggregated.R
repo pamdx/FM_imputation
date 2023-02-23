@@ -179,13 +179,13 @@ final_estimates <- estimates_table(FMfiltered = FM_filtered, reg_estimates = reg
 
 # Create rainbow visualization for each estimator type
 
-estimator_viz(estimator = "reg", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
-estimator_viz(estimator = "trend", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
-estimator_viz(estimator = "linearint", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
-estimator_viz(estimator = "histavg", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
-estimator_viz(estimator = "histgrowth", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
-estimator_viz(estimator = "bdragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
-estimator_viz(estimator = "fdragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "reg", estimator = "linear regression", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "trend", estimator = "polynomial regression", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "linearint", estimator = "linear interpolation", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "histavg", estimator = "historical average", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "histgrowth", estimator = "historical growth", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "bdragged", estimator = "backward dragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "fdragged", estimator = "forward dragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
 
 # Messages to user
 

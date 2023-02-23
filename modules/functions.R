@@ -1,3 +1,10 @@
+### PARAMETERS ###
+
+theme_set(theme_bw()) # set simple theme for charts
+flags_official <- c(NA, "B", "I", "M", "P", "Q", "T", "R")
+flag_FAOestimate <- "E"
+flag_remove <- "X"
+
 # Simple functions to select country and sector with dynamic popup windows
 
 country_input <- ""
@@ -11,7 +18,7 @@ select_country <- function(FMraw, countryinput){
 
 select_sector <- function(FMraw, countryinput){
   
-  select.list(unique(FMraw$OC2[FMraw$geographic_area == countryinput]), preselect = NULL, multiple = FALSE, graphics = TRUE, title = paste("Select the sector to estimate in", countryinput))
+  select.list(unique(sort(FMraw$OC2[FMraw$geographic_area == countryinput])), preselect = NULL, multiple = FALSE, graphics = TRUE, title = paste("Select the sector to estimate in", countryinput))
   
 }
 
@@ -25,7 +32,7 @@ FMfilter <- function(FMraw, countryinput, OC2input, startyear, endyear){
     filter(OC2 == OC2input) %>%
     filter(between(year, startyear, endyear)) %>%
     filter(!is.na(value) | !is.na(flag)) %>%
-    filter(is.na(flag) | flag == "B"  | flag == "I" | flag == "M" | flag == "P" | flag == "Q" | flag == "T" | flag == "R") %>% # Make dynamic input in Shiny
+    filter(flag %in% flags_official) %>% # Make dynamic input in Shiny
     unite("subseries", geographic_area, OC2, OC3, working_time, sex, sep = "_", remove = FALSE) %>%
     select(geographic_area:comment, subseries)
   
@@ -47,7 +54,7 @@ FMexisitingestimates <- function(FMraw, countryinput, OC2input, startyear, endye
     filter(geographic_area == countryinput) %>% # In Shiny, replace by input from dropdown menu
     filter(OC2 == OC2input) %>%
     filter(between(year, startyear, endyear)) %>%
-    filter(is.na(flag) | flag != "X") %>% # Make dynamic input in Shiny
+    filter(is.na(flag) | flag != flag_remove) %>% # Make dynamic input in Shiny
     unite("subseries", geographic_area, OC2, OC3, working_time, sex, sep = "_", remove = FALSE) %>%
     select(geographic_area:comment, subseries)
   
@@ -58,19 +65,29 @@ FMexisitingestimates <- function(FMraw, countryinput, OC2input, startyear, endye
 data_viz <- function(data, countryinput, OC2input, title){
 
 data <- data  %>%
-           unite(subseries, c("OC3", "working_time", "sex"), sep = " | ") %>%
-           mutate(alpha = case_when(flag == "E"  ~ 1,
-                                       is.na(flag) | flag == "B"  | flag == "T" | flag == "R" | flag == "Q" | flag == "I" | flag == "P"  ~ 0.35))
+  mutate(OC3_short = case_when(
+    OC3 == "Marine Coastal Fishing" ~ "Coastal",
+    OC3 == "Marine Deep-Sea Fishing" ~ "Deep-Sea",
+    OC3 == "Marine Fishing, nei" ~ "NEI",
+    .default = OC3
+  )) %>%
+  mutate(subseries = ifelse(OC2 == "Marine fishing",
+                            paste(OC3_short, working_time, sex, sep = " | "),
+                            paste(working_time, sex, sep = " | ")
+  )) %>%
+  mutate(alpha = case_when(flag == flag_FAOestimate  ~ 1,
+                           flag %in% flags_official  ~ 0.35))
 
   print(
     ggplot(data, aes(x = year, y = value, fill = subseries, alpha = alpha)) +
       geom_bar(stat="identity", colour="white") +
       labs(title = title, subtitle = paste(countryinput, "|", OC2_input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
-      scale_alpha_identity() +
       guides(alpha = "none") +
-      theme(aspect.ratio = 3/4) +
+      scale_alpha_identity() +
+      scale_fill_discrete(name = "Subseries") +
       scale_y_continuous(labels = addUnits) + 
-      scale_x_continuous(breaks = integer_breaks(), minor_breaks = seq(start_year, end_year, 1))
+      scale_x_continuous(breaks = integer_breaks(), minor_breaks = seq(start_year, end_year, 1)) +
+      theme(aspect.ratio = 3/4)
   )
   
 }
@@ -93,7 +110,7 @@ mixedflags <- function(FMraw, countryinput, OC2input, startyear, endyear){
   })
   
   dropflag <- sapply(flagtest, function(i){
-    append(dropflag, ifelse(NA %in% i & "E" %in% i , "1", "0"))
+    append(dropflag, ifelse(NA %in% i & flag_FAOestimate %in% i , "1", "0"))
   })
   
   FM_mixflags["dropflag"] <- dropflag
@@ -529,6 +546,7 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
   
   plot_emp <- ggplot(regdata, aes(x=year,y=emp_value, group = 1)) + 
     geom_line() + 
+    geom_point(alpha = 0.5) + 
     scale_x_continuous(breaks = integer_breaks()) +
     labs(title = paste(OC2input, " employment (FAO data)"), 
          subtitle = countryinput, 
@@ -538,6 +556,7 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
   
   plot_prod <- ggplot(regdata, aes(x=year,y=prod_value, group = 1)) + 
     geom_line() + 
+    geom_point(alpha = 0.5) + 
     scale_x_continuous(breaks = integer_breaks()) +
     labs(title = paste(OC2input, " production (FAO data)"), 
          subtitle = countryinput, 
@@ -547,6 +566,7 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
   
   plot_labor <- ggplot(regdata, aes(x=year, y=labor_value, group = 1)) + 
     geom_line() + 
+    geom_point(alpha = 0.5) + 
     scale_x_continuous(breaks = integer_breaks()) +
     labs(title ="Labor force (ILO data)", 
          subtitle = countryinput, 
@@ -562,6 +582,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
   
   plot_emp <- ggplot(regdata, aes(x=year,y=emp_value, group = 1)) + 
     geom_line() + 
+    geom_point(alpha = 0.5) + 
     scale_x_continuous(breaks = integer_breaks()) +
     labs(title = paste(OC2input, " employment (FAO data)"), 
          subtitle = countryinput, 
@@ -571,6 +592,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
   
   plot_prod <- ggplot(regdata, aes(x=year,y=prod_value, group = 1)) + 
     geom_line() + 
+    geom_point(alpha = 0.5) + 
     scale_x_continuous(breaks = integer_breaks()) +
     labs(title = paste(OC2input, " production (FAO data)"), 
          subtitle = countryinput, 
@@ -580,6 +602,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
   
   plot_labor <- ggplot(regdata, aes(x=year, y=labor_value, group = 1)) + 
     geom_line() + 
+    geom_point(alpha = 0.5) + 
     scale_x_continuous(breaks = integer_breaks()) +
     labs(title ="Labor force (ILO data)", 
          subtitle = countryinput, 
@@ -589,6 +612,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
   
   plot_fleet <- ggplot(regdata, aes(x=year, y=fleet_value, group = 1)) + 
     geom_line() + 
+    geom_point(alpha = 0.5) + 
     scale_x_continuous(breaks = integer_breaks()) +
     labs(title ="Fleet (OECD data)", 
          subtitle = countryinput, 
@@ -858,7 +882,7 @@ trend_fit <- function(FMagg, yearsdataexclmixed, yearsall, startyear){
   
 }
 
-# Function generating a plot representing the polynomial trend with the best fit to the data
+# Function generating a plot representing the polynomial regression with the best fit to the data
 
 trend_fit_viz <- function(trenddata, startyear, endyear, countryinput, OC2input){
   
@@ -868,7 +892,7 @@ trend_fit_viz <- function(trenddata, startyear, endyear, countryinput, OC2input)
       geom_line(aes(y = predictions, col = paste(trend_type[1], "(best fit)"))) +
       scale_x_continuous(breaks = integer_breaks()) +
       coord_cartesian(ylim=c(min(trenddata$value), max(trenddata$value))) +
-      labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from polynomial trend", caption = paste("Adjusted R-squared: ", trenddata$r2adj[1])) + xlab("Year") + ylab("Employment (people)") +
+      labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from polynomial regression", caption = paste("Adjusted R-squared: ", trenddata$r2adj[1])) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
       theme(aspect.ratio = 3/4)
   ) 
@@ -885,8 +909,8 @@ trend_estimator <- function(trenddata){
     rename(value = predictions) %>%
     filter(value >= 0)
   
-  trend_estimates$flag <- "E"
-  trend_estimates$comment <- paste0("Polynomial trend estimate (", trenddata$trend_type[1], ")")
+  trend_estimates$flag <- flag_FAOestimate
+  trend_estimates$comment <- paste0("Polynomial regression estimate (", trenddata$trend_type[1], ")")
   
   return(trend_estimates)
   
@@ -925,7 +949,7 @@ fdragged_estimator <- function(FMagg, yearsdataexclmixed, yearsall){
   
   if (nrow(fdragged_estimates) > 0) {
   
-    fdragged_estimates$flag <- "E"
+    fdragged_estimates$flag <- flag_FAOestimate
     fdragged_estimates$comment <- "Forward dragged estimate"
     
   }
@@ -968,7 +992,7 @@ bdragged_estimator <- function(FMagg, yearsdataexclmixed, yearsall){
   
   if (nrow(bdragged_estimates) > 0) {
   
-    bdragged_estimates$flag <- "E"
+    bdragged_estimates$flag <- flag_FAOestimate
     bdragged_estimates$comment <- "Backward dragged estimate"
   
   }
@@ -1017,7 +1041,7 @@ linearint_estimator <- function(FMagg, yearsdataexclmixed, yearsall){
   
   if (nrow(linearint_estimates) > 0) {
   
-    linearint_estimates$flag <- "E"
+    linearint_estimates$flag <- flag_FAOestimate
     linearint_estimates$comment <- "Linear interpolation estimate"
   
   }
@@ -1075,7 +1099,7 @@ histavg_estimator <- function(FMagg, yearsdataexclmixed, yearsall, threshold){
   
   if (nrow(histavg_estimates) > 0) {
    
-    histavg_estimates$flag <- "E"
+    histavg_estimates$flag <- flag_FAOestimate
     histavg_estimates$comment <- "Historical average estimate"
      
   }
@@ -1134,7 +1158,7 @@ histgrowth_estimator <- function(FMagg, yearsdataexclmixed, yearsall, threshold)
   
   if (nrow(histgrowth_estimates) > 0) {
   
-    histgrowth_estimates$flag <- "E"
+    histgrowth_estimates$flag <- flag_FAOestimate
     histgrowth_estimates$comment <- "Historical growth estimate"
 
   }
@@ -1155,7 +1179,7 @@ estimates_disaggregation <- function(weights, mflags, estimatesagg, countryinput
     # }))) %>%
     arrange(year) %>%
     filter(year %in% missingyears)
-  estimates_disag$flag <- "E"
+  estimates_disag$flag <- flag_FAOestimate
   estimates_disag$value <- as.integer(round(as.numeric(estimates_disag$value)))
   estimates_disag$year <- as.integer(estimates_disag$year)
   estimates_disag$comment <- comment
@@ -1176,34 +1200,41 @@ estimates_table <- function(FMfiltered, reg_estimates, trend_estimates, linearin
     bind_rows(histgrowth_estimates %>% add_column(type = "histgrowth") %>% select(subseries, year, value, type)) %>%
     bind_rows(bdragged_estimates %>% add_column(type = "bdragged") %>% select(subseries, year, value, type)) %>%
     bind_rows(fdragged_estimates %>% add_column(type = "fdragged") %>% select(subseries, year, value, type)) %>%
-    spread(type, value) %>%
+    pivot_wider(names_from = type, values_from = value) %>%
     arrange(year, subseries) %>%
-    separate(subseries, c("geographic_area", "oc2", "oc3", "working_time", "sex"), "_") %>%
-    unite(subseries, oc3, working_time, sex, sep = " | ", remove = TRUE) %>%
-    select(-c(1:2)) # %>%
-    # select(subseries, year, data, reg, trend, linearint, histavg, histgrowth, bdragged, fdragged)
+    separate(subseries, c("geographic_area", "oc2", "oc3", "working_time", "sex"), "_")
   
 }
 
 # Function to generate visualizations of estimates
 
-estimator_viz <- function(estimator, dataset, countryinput, OC2input){
+estimator_viz <- function(method, estimator, dataset, countryinput, OC2input){
   
-  if (nrow(get(paste0(estimator, "_estimates_disag"))) > 0) {
+  if (nrow(get(paste0(method, "_estimates_disag"))) > 0) {
     print(
-      ggplot(dataset %>%
-               mutate(
-                 value = case_when(
-                   is.na(data) ~ get(estimator),
-                   !is.na(data) ~ data),
-                 alpha = case_when(
-                   is.na(data) ~ 1,
-                   !is.na(data) ~ 0.35))
-             , aes(x = year, y = value, fill = subseries, alpha = alpha)) +
+      
+      dataset %>%
+        mutate(oc3_short = case_when(
+          oc3 == "Marine Coastal Fishing" ~ "Coastal",
+          oc3 == "Marine Deep-Sea Fishing" ~ "Deep-Sea",
+          oc3 == "Marine Fishing, nei" ~ "NEI",
+          .default = oc3)) %>%
+        mutate(subseries = ifelse(oc2 == "Marine fishing",
+                                  paste(oc3_short, working_time, sex, sep = " | "),
+                                  paste(working_time, sex, sep = " | "))) %>%
+        mutate(value = case_when(
+          is.na(data) ~ get(method),
+          !is.na(data) ~ data),
+              alpha = case_when(
+                is.na(data) ~ 1,
+                !is.na(data) ~ 0.35)) %>%
+        
+      ggplot(aes(x = year, y = value, fill = subseries, alpha = alpha)) +
         geom_bar(aes(y = value, fill = subseries), stat="identity", colour="white") + 
         labs(title = paste("Visualization of official data and", estimator, "estimator"), subtitle = paste(countryinput, "|", OC2input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
-        scale_alpha_identity() +
         guides(alpha = "none") +
+        scale_alpha_identity() +
+        scale_fill_discrete(name = "Subseries") +
         scale_y_continuous(labels = addUnits) + 
         scale_x_continuous(breaks = integer_breaks(), minor_breaks = seq(start_year, end_year, 1)) +
         theme(aspect.ratio = 3/4)
@@ -1228,13 +1259,15 @@ aggregated_imputation <- function(finalestimates, missingyears, imputeddata, reg
   
   # Get list of available estimators per year
   
-  estimators_year <- finalestimates %>% 
+  estimators_year <- finalestimates %>%
+    unite(subseries, oc3, working_time, sex, sep = " | ", remove = TRUE) %>%
+    select(-c(geographic_area, oc2)) %>% 
     pivot_longer(-c(subseries, year), names_to = "type", values_to = "value") %>%
     filter(!is.na(value), type != "data") %>%
     mutate(
       estimator = case_when(
         type == "reg" ~ "Linear regression",
-        type == "trend" ~ "Polynomial trend",
+        type == "trend" ~ "Polynomial regression",
         type == "linearint" ~ "Linear interpolation",
         type == "histavg" ~ "Historical average",
         type == "histgrowth" ~ "Historical growth",
@@ -1243,11 +1276,11 @@ aggregated_imputation <- function(finalestimates, missingyears, imputeddata, reg
       )) %>%
     select(year, estimator) %>%
     bind_rows(FMexisitingestimates %>%
-                filter(flag == "E") %>%
+                filter(flag == flag_FAOestimate) %>%
                 select(year) %>%
                 mutate(estimator = "[Keep existing estimates]"))
   
-  estimators_order <- c("Linear regression", "Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged")
+  estimators_order <- c("Linear regression", "Polynomial regression", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged")
   
   for (i in missingyears) {
     
@@ -1267,7 +1300,7 @@ aggregated_imputation <- function(finalestimates, missingyears, imputeddata, reg
                          mutate(comment = paste0(comment, ", aggregated imputation")) %>%
                          mutate(timestamp = paste(Sys.time()))),
            
-           "Polynomial trend" = imputeddata <- imputeddata %>% 
+           "Polynomial regression" = imputeddata <- imputeddata %>% 
              bind_rows(trendestimatesdisag %>%
                          filter(year %in% i) %>%
                          mutate(comment = paste0(comment, ", aggregated imputation")) %>%
@@ -1305,7 +1338,7 @@ aggregated_imputation <- function(finalestimates, missingyears, imputeddata, reg
            
            "[Keep existing estimates]" = imputeddata <- imputeddata %>% 
              bind_rows(FMexisitingestimates %>%
-                         filter(year %in% i, flag == "E") %>%
+                         filter(year %in% i, flag == flag_FAOestimate) %>%
                          select(subseries, year, value, flag, comment))
            
     )
@@ -1338,7 +1371,9 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
   
   while (imputation_on) {
     
-    selected_subseries <- select.list(c(ss, "Stop imputation"), preselect = NULL, multiple = FALSE, graphics = TRUE, title=paste0("Which subseries would you like estimate?"))
+    selected_subseries <- select.list(c(gsub("_", " | ", ss, fixed = TRUE), "Stop imputation"), preselect = NULL, multiple = FALSE, graphics = TRUE, title=paste0("Which subseries would you like estimate?"))
+    
+    selected_subseries <- gsub(" | ", "_", selected_subseries, fixed = TRUE)
     
     if (selected_subseries == "Stop imputation") {
      
@@ -1348,7 +1383,7 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
        
     }
     
-    selected_estimator <- select.list(c("Polynomial trend", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged", "[Remove estimated data]"), preselect = NULL, multiple = FALSE, graphics = TRUE, title = "Which estimator would you like to apply?")
+    selected_estimator <- select.list(c("Polynomial regression", "Linear interpolation", "Historical average", "Historical growth", "Backward dragged", "Forward dragged", "[Remove estimated data]"), preselect = NULL, multiple = FALSE, graphics = TRUE, title = "Which estimator would you like to apply?")
     
     selected_year <- select.list(as.character(setdiff(years_all, FM_filtered$year[FM_filtered$subseries == selected_subseries])), preselect = NULL, multiple = TRUE, graphics = TRUE, title = "On which missing years should the estimation be performed?")
     
@@ -1356,8 +1391,8 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
     
     switch(selected_estimator,
            
-           "Polynomial trend" = imputeddata <- imputeddata %>%
-             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
+           "Polynomial regression" = imputeddata <- imputeddata %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == flag_FAOestimate)) %>%
              bind_rows(trend_estimator(trenddata = trend_fit(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all, startyear = start_year)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
@@ -1365,7 +1400,7 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
                          mutate(timestamp = paste(Sys.time()))),
            
            "Linear interpolation" = imputeddata <- imputeddata %>%
-             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == flag_FAOestimate)) %>%
              bind_rows(filter(linearint_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
@@ -1373,7 +1408,7 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
                          mutate(timestamp = paste(Sys.time()))),
            
            "Historical average" = imputeddata <- imputeddata %>%
-             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == flag_FAOestimate)) %>%
              bind_rows(filter(histavg_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all, threshold = histavg_threshold), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
@@ -1381,7 +1416,7 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
                          mutate(timestamp = paste(Sys.time()))),
            
            "Historical growth" = imputeddata <- imputeddata %>%
-             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == flag_FAOestimate)) %>%
              bind_rows(filter(histgrowth_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all, threshold = histgrowth_threshold), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
@@ -1389,7 +1424,7 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
                          mutate(timestamp = paste(Sys.time()))),
            
            "Backward dragged" = imputeddata <- imputeddata %>%
-             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == flag_FAOestimate)) %>%
              bind_rows(filter(bdragged_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
@@ -1397,7 +1432,7 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
                          mutate(timestamp = paste(Sys.time()))),
            
            "Forward dragged" = imputeddata <- imputeddata %>%
-             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E")) %>%
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == flag_FAOestimate)) %>%
              bind_rows(filter(fdragged_estimator(FMagg = filter(FMfiltered, subseries == selected_subseries), yearsdataexclmixed = years_all, yearsall = years_all), !is.na(value)) %>%
                          filter(year %in% as.integer(selected_year)) %>%
                          mutate(subseries = selected_subseries) %>%
@@ -1405,7 +1440,7 @@ subseries_imputation <- function(ss, imputeddata, FMfiltered){
                          mutate(timestamp = paste(Sys.time()))),
            
            "[Remove estimated data]" = imputeddata <- imputeddata %>%
-             filter(!(year %in% selected_year & subseries == selected_subseries & flag == "E"))
+             filter(!(year %in% selected_year & subseries == selected_subseries & flag == flag_FAOestimate))
     )
     
     data_viz(data = imputeddata %>%

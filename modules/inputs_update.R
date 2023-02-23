@@ -7,31 +7,31 @@ library(OECD)
 
 # Import country names mapping
 
-country_names <- read_csv("https://raw.githubusercontent.com/openfigis/RefData/gh-pages/country/CL_FI_COUNTRY_ITEM.csv") %>%
+country_names <- read_csv("https://raw.githubusercontent.com/openfigis/RefData/gh-pages/country/CL_FI_COUNTRY_M49.csv") %>%
   select(Name_En, ISO3_Code) %>%
   rename(Country_en = Name_En, iso3 = ISO3_Code)
 
 # Import employment data
 
-FM_raw <- read_tsv("./inputs/FM_DB.txt", col_types = cols(
-  geographic_area = col_character(),
-  OC2 = col_character(),
-  OC3 = col_character(),
-  working_time = col_character(),
-  sex = col_character(),
-  year = col_integer(),
-  value = col_integer(),
-  flag = col_character(),
-  comment = col_character()
-))
-
-saveRDS(FM_raw, "./inputs/FM_DB.RDS")
+# FM_raw <- read_tsv("./inputs/FM_DB.txt", col_types = cols(
+#   geographic_area = col_character(),
+#   OC2 = col_character(),
+#   OC3 = col_character(),
+#   working_time = col_character(),
+#   sex = col_character(),
+#   year = col_integer(),
+#   value = col_integer(),
+#   flag = col_character(),
+#   comment = col_character()
+# ))
+# 
+# saveRDS(FM_raw, "./inputs/FM_DB.RDS")
 
 # Get FAO production data
 
 temp <- tempfile()
-download.file("http://www.fao.org/fishery/static/Data/GlobalProduction_2021.1.2.zip", temp)
-data <- read_csv(unz(temp, "GLOBAL_PRODUCTION_QUANTITY.csv"))
+download.file("http://www.fao.org/fishery/static/Data/GlobalProduction_2022.1.1.zip", temp)
+data <- read_csv(unz(temp, "Global_production_Quantity.csv"))
 countries <- read_csv(unz(temp, "CL_FI_COUNTRY_GROUPS.csv"))
 areas <- read_csv(unz(temp, "CL_FI_WATERAREA_GROUPS.csv"))
 
@@ -61,14 +61,12 @@ saveRDS(prod_raw, "./inputs/PROD.RDS")
 
 # Get ILO labor force data
 
-target_labor_classif1 <- c("AGE_5YRBANDS_Y15-19", "AGE_5YRBANDS_Y20-24", "AGE_5YRBANDS_Y25-29", "AGE_5YRBANDS_Y30-34", "AGE_5YRBANDS_Y35-39", "AGE_5YRBANDS_Y40-44", "AGE_5YRBANDS_Y45-49", "AGE_5YRBANDS_Y50-54", "AGE_5YRBANDS_Y55-59", "AGE_5YRBANDS_Y60-64", "AGE_5YRBANDS_YGE65")
-
 ILO_labor_raw <- get_ilostat("EAP_2EAP_SEX_AGE_NB_A") %>%
   rename(iso3 = ref_area, year = time) %>%
   merge(country_names) %>%
-  filter(classif1 %in% target_labor_classif1) %>% 
+  filter(classif1 == "AGE_AGGREGATE_TOTAL") %>% 
   filter(sex != "SEX_T") %>% 
-  mutate(labor_value = obs_value * 1000)
+  mutate(labor_value = obs_value * 1000, year = as.integer(year))
 
 if (nrow(ILO_labor_raw[is.na(ILO_labor_raw$Country_en),]) > 0) {
   print(ILO_labor_raw[is.na(ILO_labor_raw$Country_en),])
@@ -81,9 +79,10 @@ saveRDS(ILO_labor_raw, "./inputs/ILO_labor.RDS")
 
 OECD_fleet_raw <- OECD::get_dataset(dataset = "FISH_FLEET") %>%
   filter(FLEET == "TOT_VESSEL", MEASURE == "NUM", TIME_FORMAT == "P1Y", UNIT == "NBR") %>%
-  rename(iso3 = COUNTRY, year = obsTime, fleet_value = obsValue) %>%
+  rename(iso3 = COUNTRY, year = Time, fleet_value = ObsValue) %>%
   left_join(country_names, by = "iso3") %>%
-  select(Country_en, year, fleet_value)
+  select(Country_en, year, fleet_value) %>%
+  mutate(year = as.integer(year), fleet_value = as.integer(fleet_value))
 
 if (nrow(OECD_fleet_raw[is.na(OECD_fleet_raw$Country_en),]) > 0) {
   print(OECD_fleet_raw[is.na(OECD_fleet_raw$Country_en),])
