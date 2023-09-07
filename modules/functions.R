@@ -69,25 +69,25 @@ data <- data  %>%
     OC3 == "Marine Coastal Fishing" ~ "Coastal",
     OC3 == "Marine Deep-Sea Fishing" ~ "Deep-Sea",
     OC3 == "Marine Fishing, nei" ~ "NEI",
-    .default = OC3
+    TRUE ~ OC3
   )) %>%
   mutate(subseries = ifelse(OC2 == "Marine fishing",
                             paste(OC3_short, working_time, sex, sep = " | "),
                             paste(working_time, sex, sep = " | ")
   )) %>%
-  mutate(alpha = case_when(flag == flag_FAOestimate  ~ 1,
-                           flag %in% flags_official  ~ 0.35))
+  mutate(alpha = case_when(flag == flag_FAOestimate  ~ 0.35,
+                           flag %in% flags_official  ~ 1))
 
   print(
     ggplot(data, aes(x = year, y = value, fill = subseries, alpha = alpha)) +
       geom_bar(stat="identity", colour="white") +
-      labs(title = title, subtitle = paste(countryinput, "|", OC2_input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
+      labs(title = title, subtitle = paste(countryinput, "|", OC2_input), y = "Employment (people)", caption = "Solid bars indicate official data or alternative sources. Transparent bars indicate estimates.") +
       guides(alpha = "none") +
       scale_alpha_identity() +
       scale_fill_discrete(name = "Subseries") +
       scale_y_continuous(labels = addUnits) + 
       scale_x_continuous(breaks = integer_breaks(), minor_breaks = seq(start_year, end_year, 1)) +
-      theme(aspect.ratio = 3/4)
+      theme(aspect.ratio = 3/4, axis.title.x = element_blank(), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
   )
   
 }
@@ -552,7 +552,7 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
-    theme(aspect.ratio = 3/4)
+    theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   
   plot_prod <- ggplot(regdata, aes(x=year,y=prod_value, group = 1)) + 
     geom_line() + 
@@ -562,7 +562,7 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
          subtitle = countryinput, 
          y="Tonnes") +
     scale_y_continuous(labels = addUnits) + 
-    theme(aspect.ratio = 3/4)
+    theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   
   plot_labor <- ggplot(regdata, aes(x=year, y=labor_value, group = 1)) + 
     geom_line() + 
@@ -572,7 +572,7 @@ reg_variables_viz <- function(regdata, startyear, endyear, OC2input, countryinpu
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
-    theme(aspect.ratio = 3/4)
+    theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   
   return(grid.arrange(plot_emp, plot_prod, plot_labor, ncol=2))
   
@@ -588,7 +588,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
-    theme(aspect.ratio = 3/4)
+    theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   
   plot_prod <- ggplot(regdata, aes(x=year,y=prod_value, group = 1)) + 
     geom_line() + 
@@ -598,7 +598,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
          subtitle = countryinput, 
          y="Tonnes") +
     scale_y_continuous(labels = addUnits) + 
-    theme(aspect.ratio = 3/4)
+    theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   
   plot_labor <- ggplot(regdata, aes(x=year, y=labor_value, group = 1)) + 
     geom_line() + 
@@ -608,7 +608,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
          subtitle = countryinput, 
          y="Number of people") +
     scale_y_continuous(labels = addUnits) + 
-    theme(aspect.ratio = 3/4)
+    theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   
   plot_fleet <- ggplot(regdata, aes(x=year, y=fleet_value, group = 1)) + 
     geom_line() + 
@@ -618,7 +618,7 @@ reg_variables_viz_fleet <- function(regdata, startyear, endyear, OC2input, count
          subtitle = countryinput, 
          y="Number of vessels") +
     scale_y_continuous(labels = addUnits) + 
-    theme(aspect.ratio = 3/4)
+    theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   
   return(grid.arrange(plot_emp, plot_prod, plot_labor, plot_fleet, ncol=2))
   
@@ -798,7 +798,8 @@ reg_fit_viz <- function(regdata, bestfit, startyear, endyear, countryinput, OC2i
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from linear regression", caption = paste("Adjusted R-squared: ", best_R2)) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
       scale_x_continuous(breaks = integer_breaks()) +
-      theme(aspect.ratio = 3/4)
+      scale_color_discrete(name = "Legend") +
+      theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   ) 
   
 }
@@ -812,8 +813,8 @@ reg_fit_viz_manual <- function(regdata, startyear, endyear, countryinput, OC2inp
       scale_x_continuous(breaks = integer_breaks()) +
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from linear regression", caption = paste("Adjusted R-squared: ", best_R2)) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
-      
-      theme(aspect.ratio = 3/4)
+      scale_color_discrete(name = "Legend") +
+      theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   ) 
   
 }
@@ -894,7 +895,8 @@ trend_fit_viz <- function(trenddata, startyear, endyear, countryinput, OC2input)
       coord_cartesian(ylim=c(min(trenddata$value), max(trenddata$value))) +
       labs(title = paste(countryinput, ", ", OC2input, " employment", sep = ""), subtitle = "Original data vs. predicted values from polynomial regression", caption = paste("Adjusted R-squared: ", trenddata$r2adj[1])) + xlab("Year") + ylab("Employment (people)") +
       scale_y_continuous(labels = addUnits) + 
-      theme(aspect.ratio = 3/4)
+      scale_color_discrete(name = "Legend") +
+      theme(aspect.ratio = 3/4, axis.title.x = element_blank())
   ) 
   
 }
@@ -1218,7 +1220,7 @@ estimator_viz <- function(method, estimator, dataset, countryinput, OC2input){
           oc3 == "Marine Coastal Fishing" ~ "Coastal",
           oc3 == "Marine Deep-Sea Fishing" ~ "Deep-Sea",
           oc3 == "Marine Fishing, nei" ~ "NEI",
-          .default = oc3)) %>%
+          TRUE ~ oc3)) %>%
         mutate(subseries = ifelse(oc2 == "Marine fishing",
                                   paste(oc3_short, working_time, sex, sep = " | "),
                                   paste(working_time, sex, sep = " | "))) %>%
@@ -1226,18 +1228,18 @@ estimator_viz <- function(method, estimator, dataset, countryinput, OC2input){
           is.na(data) ~ get(method),
           !is.na(data) ~ data),
               alpha = case_when(
-                is.na(data) ~ 1,
-                !is.na(data) ~ 0.35)) %>%
+                is.na(data) ~ 0.35,
+                !is.na(data) ~ 1)) %>%
         
       ggplot(aes(x = year, y = value, fill = subseries, alpha = alpha)) +
         geom_bar(aes(y = value, fill = subseries), stat="identity", colour="white") + 
-        labs(title = paste("Visualization of official data and", estimator, "estimator"), subtitle = paste(countryinput, "|", OC2input), x = "Year", y = "Employment (people)", caption = "Transparent bars indicate official data or alternative sources. Solid bars indicate estimates.") +
+        labs(title = paste("Visualization of official data and", estimator, "estimator"), subtitle = paste(countryinput, "|", OC2input), y = "Employment (people)", caption = "Solid bars indicate official data or alternative sources. Transparent bars indicate estimates.") +
         guides(alpha = "none") +
         scale_alpha_identity() +
         scale_fill_discrete(name = "Subseries") +
         scale_y_continuous(labels = addUnits) + 
         scale_x_continuous(breaks = integer_breaks(), minor_breaks = seq(start_year, end_year, 1)) +
-        theme(aspect.ratio = 3/4)
+        theme(aspect.ratio = 3/4, axis.title.x = element_blank(), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
     )
   }
   
@@ -1251,6 +1253,16 @@ imputed_data_init <- function(data){
     select(subseries, year, value, flag, comment) %>%
     mutate(timestamp = as.character(NA))
   
+}
+
+# Function to condense lists of years
+
+findIntRuns <- function(run){
+  rundiff <- c(1, diff(run))
+  difflist <- split(run, cumsum(rundiff!=1))
+  unname(sapply(difflist, function(x){
+    if(length(x) == 1) as.character(x) else paste0(x[1], "-", x[length(x)])
+  }))
 }
 
 # Aggregated imputation
@@ -1290,7 +1302,7 @@ aggregated_imputation <- function(finalestimates, missingyears, imputeddata, reg
         pull(estimator)
       )
     
-    selected_estimator <- select.list(c(estimators[order(match(estimators, estimators_order))]), preselect = NULL, multiple = FALSE, graphics = TRUE, title=paste0("Estimator for ", toString(i), "?"))
+    selected_estimator <- select.list(c(estimators[order(match(estimators, estimators_order))]), preselect = NULL, multiple = FALSE, graphics = TRUE, title=paste0("Estimator for ", paste(findIntRuns(i), sep="", collapse=", "), "?"))
     
     switch(selected_estimator,
            

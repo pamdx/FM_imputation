@@ -30,7 +30,7 @@ country_names <- read_csv("https://raw.githubusercontent.com/openfigis/RefData/g
 # Get FAO production data
 
 temp <- tempfile()
-download.file("http://www.fao.org/fishery/static/Data/GlobalProduction_2022.1.1.zip", temp)
+download.file("https://www.fao.org/fishery/static/Data/GlobalProduction_2023.1.1.zip", temp)
 data <- read_csv(unz(temp, "Global_production_Quantity.csv"))
 countries <- read_csv(unz(temp, "CL_FI_COUNTRY_GROUPS.csv"))
 areas <- read_csv(unz(temp, "CL_FI_WATERAREA_GROUPS.csv"))
