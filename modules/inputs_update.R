@@ -31,7 +31,7 @@ country_names <- read_csv("https://raw.githubusercontent.com/openfigis/RefData/g
 
 temp <- tempfile()
 download.file("https://www.fao.org/fishery/static/Data/GlobalProduction_2023.1.1.zip", temp)
-data <- read_csv(unz(temp, "Global_production_Quantity.csv"))
+data <- read_csv(unz(temp, "Global_production_quantity.csv"))
 countries <- read_csv(unz(temp, "CL_FI_COUNTRY_GROUPS.csv"))
 areas <- read_csv(unz(temp, "CL_FI_WATERAREA_GROUPS.csv"))
 
@@ -57,7 +57,7 @@ unlink(temp)
 
 prod_raw$year <- as.integer(prod_raw$year)
 
-saveRDS(prod_raw, "./inputs/PROD.RDS")
+saveRDS(prod_raw, paste0(input_directory, "PROD.RDS"))
 
 # Get ILO labor force data
 
@@ -73,7 +73,7 @@ if (nrow(ILO_labor_raw[is.na(ILO_labor_raw$Country_en),]) > 0) {
   stop("missing country mapping")
 }
 
-saveRDS(ILO_labor_raw, "./inputs/ILO_labor.RDS")
+saveRDS(ILO_labor_raw, paste0(input_directory, "ILO_labor.RDS"))
 
 # Get OECD fleet data
 
@@ -89,4 +89,4 @@ if (nrow(OECD_fleet_raw[is.na(OECD_fleet_raw$Country_en),]) > 0) {
   stop("missing country mapping")
 }
 
-saveRDS(OECD_fleet_raw, "./inputs/OECD_fleet.RDS")
+saveRDS(OECD_fleet_raw, paste0(input_directory, "OECD_fleet.RDS"))

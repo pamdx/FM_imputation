@@ -1,13 +1,6 @@
-# General parameters
-
-country_input <- select_country(FM_raw, country_input)
-OC2_input <- select_sector(FM_raw, country_input)
-start_year <- 1995
-end_year <- 2021 # MAKE SURE TO UPDATE
-input_directory <- "./inputs/"
-output_directory <- "./outputs/"
-
 #### Estimations parameters ####
+
+agg_imputation_type <- 1 # Select 1 to apply estimation to all missing consecutive years, select 2 to apply estimation separately to each year in the period with consecutive missing years.
 
 # Linear regression
 
@@ -28,5 +21,3 @@ fit_threshold_trend <- 0 # R2-squared threshold for the regression to be taken i
 
 histavg_threshold <- 5 # Number of previous years on which to base historical average estimates
 histgrowth_threshold <- 5 # Number of previous years on which to base historical growth estimates
-
-#####

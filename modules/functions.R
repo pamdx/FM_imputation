@@ -5,7 +5,7 @@ flags_official <- c(NA, "B", "I", "M", "P", "Q", "T", "R")
 flag_FAOestimate <- "E"
 flag_remove <- "X"
 
-# Simple functions to select country and sector with dynamic popup windows
+# Simple functions to select country and sector with popup windows
 
 country_input <- ""
 

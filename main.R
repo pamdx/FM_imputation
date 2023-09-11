@@ -2,39 +2,44 @@
 
 rm(list=ls()) # clear R environment
 
-# Load packages
+#### Paths to scripts and folders ####
 
-pkgs <- c("dplyr", "ggplot2", "readr", "tidyr", "tibble", "compareDF", "stargazer", "gridExtra", "rmarkdown")
-lapply(pkgs, require, character.only = TRUE) # One-liner to load all packages
+input_directory <- "./inputs/"
+output_directory <- "./outputs/"
 
-# Load app functions
+path_data_import <- "./modules/data_import.R"
+path_final_data_export_viz <- "./modules/final_data_export_viz.R"
+path_functions <- "./modules/functions.R"
+path_imputation_aggregated <- "./modules/imputation_aggregated.R"
+path_imputation_subseries <- "./modules/imputation_subseries.R"
+path_initialization <- "./modules/initialization.R"
+path_inputs_update <- "./modules/inputs_update.R"
+path_processing_aggregated <- "./modules/processing_aggregated.R"
+path_report_imputation <- "./modules/report_imputation.Rmd"
+path_subseries_analysis <- "./modules/subseries_analysis.R"
+path_parameters_estimations <- "./modules/parameters_estimations.R"
+path_parameters_emputator <- "./modules/parameters_emputator.R"
 
-source("./modules/functions.R")
+#### ####
 
-# Load data from inputs folder
+# Initialize app
 
-source("./modules/data_import.R")
+source(path_initialization)
 
-# Load app parameters
+# Load estimation parameters
 
-source("parameters.R")
-
-# Subseries-related analyses
-
-source("./modules/subseries_analysis.R")
+source(path_parameters_estimations)
 
 # Aggregated imputation
 
-source("./modules/processing_aggregated.R")
+source(path_processing_aggregated)
 
-agg_imputation_type <- 1 # Select 1 to apply estimation to all missing consecutive years, select 2 to apply estimation separately to each year in the period with consecutive missing years.
-
-source("./modules/imputation_aggregated.R")
+source(path_imputation_aggregated)
 
 # Subseries imputation
 
-source("./modules/imputation_subseries.R")
+source(path_imputation_subseries)
 
 # Final data export and report generation
 
-source("./modules/final_data_export_viz.R")
+source(path_final_data_export_viz)

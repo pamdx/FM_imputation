@@ -6,7 +6,7 @@ productivity_imputed <- productivity_table(imputed_data %>%
 
 # Create R Markdown report
 
-rmarkdown::render("./modules/report.Rmd", output_dir = output_directory, output_file = paste0(iconv(gsub("/", "-", country_input), to="ASCII//TRANSLIT"), "_", OC2_input, "_report.html"))
+rmarkdown::render(path_report_imputation, output_dir = output_directory, output_file = paste0(iconv(gsub("/", "-", country_input), to="ASCII//TRANSLIT"), "_", OC2_input, "_report.html"))
 
 # Save imputed data as CSV
 

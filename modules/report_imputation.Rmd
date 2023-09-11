@@ -2,7 +2,7 @@
 title: | 
  | Employment Imputation Report:
  | `r paste(country_input, '-', OC2_input)`
-date: "`r format(Sys.time(), '%d %B %Y')`"
+date: "`r format(Sys.time(), '%d %B %Y, %H:%M')`"
 output: html_document
 ---
 
@@ -113,7 +113,7 @@ reg_fit_viz_manual(regdata = reg_data, startyear = start_year, endyear = end_yea
 
 if (nrow(reg_estimates_disag > 0)) {
 
-estimator_viz(estimator = "reg", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "reg", estimator = "linear regression", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
    
 }
 
@@ -129,7 +129,7 @@ if (nrow(trend_estimates_disag > 0)) {
   
   trend_fit_viz(trenddata = trend_predictions_agg, startyear = start_year, endyear = end_year, countryinput = country_input, OC2input = OC2_input)
   
-  estimator_viz(estimator = "trend", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+  estimator_viz(method = "trend", estimator = "polynomial regression", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
    
 }
 
@@ -141,7 +141,7 @@ if (nrow(trend_estimates_disag > 0)) {
 
 if (nrow(linearint_estimates_disag > 0)) {
 
-estimator_viz(estimator = "linearint", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "linearint", estimator = "linear interpolation", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
 
 }
 
@@ -153,7 +153,7 @@ estimator_viz(estimator = "linearint", dataset = final_estimates, countryinput =
 
 if (nrow(histavg_estimates_disag > 0)) {
 
-estimator_viz(estimator = "histavg", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "histavg", estimator = "historical average", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
 
 }
 
@@ -165,7 +165,7 @@ estimator_viz(estimator = "histavg", dataset = final_estimates, countryinput = c
 
 if (nrow(histgrowth_estimates_disag > 0)) {
 
-estimator_viz(estimator = "histgrowth", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "histgrowth", estimator = "historical growth", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
 
 }
 
@@ -177,7 +177,7 @@ estimator_viz(estimator = "histgrowth", dataset = final_estimates, countryinput 
 
 if (nrow(bdragged_estimates_disag > 0)) {
 
-estimator_viz(estimator = "bdragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "bdragged", estimator = "backward dragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
 
 }
 
@@ -189,7 +189,7 @@ estimator_viz(estimator = "bdragged", dataset = final_estimates, countryinput = 
 
 if (nrow(fdragged_estimates_disag > 0)) {
 
-estimator_viz(estimator = "fdragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
+estimator_viz(method = "fdragged", estimator = "forward dragged", dataset = final_estimates, countryinput = country_input, OC2input = OC2_input)
 
 }
 
