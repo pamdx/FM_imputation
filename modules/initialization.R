@@ -9,7 +9,7 @@ source(path_functions)
 
 # Load app parameters
 
-source(path_parameters_emputator)
+source(path_parameters_imputation)
 
 # Subseries-related analyses
 

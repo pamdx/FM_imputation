@@ -19,7 +19,7 @@ path_report_imputation <- "./modules/report_FM_imputation.Rmd"
 path_subseries_analysis <- "./modules/subseries_analysis.R"
 
 path_parameters_estimations <- "./parameters/parameters_estimations.R"
-path_parameters_emputator <- "./parameters/parameters_FM_imputation.R"
+path_parameters_imputation <- "./parameters/parameters_FM_imputation.R"
 
 #### ####
 
