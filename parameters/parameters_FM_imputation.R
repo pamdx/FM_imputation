@@ -8,6 +8,6 @@ start_year <- 1995
 end_year <- 2021 # MAKE SURE TO UPDATE
 
 theme_set(theme_bw()) # set simple theme for charts
-flags_official <- c(NA, "B", "I", "M", "P", "Q", "T", "R")
+flags_official <- c(NA, "B", "I", "K", "M", "P", "Q", "T", "R")
 flag_FAOestimate <- "E"
 flag_remove <- "X"

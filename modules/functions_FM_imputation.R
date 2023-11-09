@@ -103,7 +103,7 @@ mixedflags <- function(FMraw, countryinput, OC2input, startyear, endyear){
   })
   
   dropflag <- sapply(flagtest, function(i){
-    append(dropflag, ifelse(NA %in% i & flag_FAOestimate %in% i , "1", "0"))
+    append(dropflag, ifelse((any(flags_official %in% i) | any(is.na(i))) & flag_FAOestimate %in% i , "1", "0"))
   })
   
   FM_mixflags["dropflag"] <- dropflag
